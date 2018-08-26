@@ -37,13 +37,16 @@ function TowerObj(sprite, point, type, variations, emitterOn, partSprite) {
     };
     this.setTarget = function(point) {
         this.target = point;
-        const span = 360 / 8, degreeOffset = span / 2;
-        let result = Math.atan2(this.point.x - point.x, this.point.y - point.y) * 180 / Math.PI;
-        let zeroDegreeIsUp = (result < 0 ? 360 + result : result) % 360;
-        let angle = (zeroDegreeIsUp + 90) % 360;
-        // Mirror so 0 degrees is on the left increasing clockwise
-        let mirrorAngle = (angle > 180 ? 180 - angle + 360 : 180 - angle);
-        this.col = Math.floor((mirrorAngle + degreeOffset) % 360 / span);
+        this.setBarrelAngle(this.toDegree(
+            Math.atan2(this.point.y - point.y, this.point.x - point.x)));
+    };
+    this.toDegree = function(radian) {
+        let degree = radian * 180 / Math.PI;
+        return degree < 0 ? degree + 360 : degree % 360;
+    };
+    this.setBarrelAngle = function(degree) {
+        const span = 360 / 8, toCenter = span / 2;
+        this.col = Math.floor((degree + toCenter) % 360 / span);
     };
 }
 
