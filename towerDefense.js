@@ -164,8 +164,9 @@ function GameObj(canvas) {
                     }
                     if(tower.point.distFrom(creep.point) < tower.range) {
                         tower.setTarget(creep.point);
-                        tower.emitter.direction = tower.point.getVector(
-                            creep.point).multi(tower.speed);
+                        let direction = creep.point.sub(
+                            tower.point.x, tower.point.y).normalize();
+                        tower.emitter.direction = direction.multi(tower.speed);
                         if (tower.currentReload <= 0) {
                             tower.emitter.addparticle();
                             tower.currentReload = tower.reload;
