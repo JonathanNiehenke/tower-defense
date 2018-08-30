@@ -49,3 +49,31 @@ function IsoCircle(context) {
     return this;
 }
 
+function HealthBar(context) {
+    this.context = context;
+    this.draw = function(x, y, maxLength, width, stroke, percent) {
+        const radius = width / 2;
+        this.path(x + radius, y + radius, maxLength * percent - width, radius);
+        context.strokeStyle = stroke;
+        context.fillStyle = this.fill(x, maxLength);
+        context.stroke();
+        context.fill();
+    };
+    this.path = function(x, y, length, radius) {
+        const arcTop = 1.5 * Math.PI, arcBot = 0.5 * Math.PI;
+        context.beginPath();
+        context.arc(x + length, y, radius, arcTop, arcBot);
+        context.arc(x, y, radius, arcBot, arcTop);
+        context.closePath();
+    };
+    this.fill = function(x, maxLength) {
+        let gradient = context.createLinearGradient(
+            x, 0, x + maxLength, 0);
+        gradient.addColorStop(0,"red");
+        gradient.addColorStop(0.5,"yellow");
+        gradient.addColorStop(1,"green");
+        return gradient;
+    };
+    return this;
+}
+

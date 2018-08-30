@@ -192,7 +192,8 @@ function GameObj(canvas) {
             let spacing = Math.floor(Math.random() * 70) + 30;  // 30 - 99
             let health = 250 / create;
             let wave = new WaveObj( this.sprites["slime"], create,
-                this.map.startPoint, this.map.initialHeading, spacing, health);
+                this.map.startPoint, this.map.initialHeading, spacing, health,
+                new HealthBar(this.context));
             this.waves.push(wave);
         }
         this.update();
