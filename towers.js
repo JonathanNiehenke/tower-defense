@@ -1,8 +1,10 @@
-function TowerObj(sprite, point, type, variations, emitterOn, partSprite) {
+function TowerObj(
+    sprite, point, type, variations, rangeShape, emitterOn, partSprite) {
     this.sprite = sprite;
     this.point = point;
     this.type = type;
     this.variations = variations.slice(type, type + 3);
+    this.rangeShape = rangeShape;
     this.isEmitterOn = emitterOn;
     this.emitter = new Emitter(this.point, new PointObj(0, 0), 80,
         this.variations[0].pAmount, partSprite);
@@ -22,6 +24,10 @@ function TowerObj(sprite, point, type, variations, emitterOn, partSprite) {
             this.col, this.type + this.level, drawPos.x, drawPos.y);
         if (this.isEmitterOn)
             this.emitter.draw();
+    };
+    this.highlightRange = function() {
+        this.rangeShape.draw(this.point.x, this.point.y, this.range, undefined,
+            "SteelBlue",  "rgba(30, 144, 255, 0.20)")
     };
     this.upgrade = function() {
         this.level += this.level < 2 ? 1 : 0;

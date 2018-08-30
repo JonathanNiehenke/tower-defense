@@ -33,3 +33,19 @@ function IsoTangle(context) {
     return this;
 }
 
+function IsoCircle(context) {
+    this.context = context;
+    this.draw = function(x, y, radius, _, stroke, fill) {
+        this.path(x, y, radius);
+        context.strokeStyle = stroke;
+        context.fillStyle = fill;
+        context.stroke();
+        context.fill();
+    };
+    this.path = function(x, y, radius) {
+        this.context.beginPath();
+        this.context.ellipse(x, y, radius * 2, radius, 0, 0, 2 * Math.PI);
+    };
+    return this;
+}
+

@@ -78,7 +78,8 @@ function GameObj(canvas) {
         {
             this.clickedTower = new TowerObj(
                 this.sprites["towers"], clicked.innerPos, clicked.cell.x * 3,
-                this.towerVariations, false, this.sprites.balls);
+                this.towerVariations, new IsoCircle(this.context), false,
+                this.sprites.balls);
         }
         else if (this.map.isMap(mouseGridPos) &&
                  this.map.getGridVal(mouseGridPos) === 0)
@@ -103,16 +104,6 @@ function GameObj(canvas) {
             }
         }
         this.clickedTower = undefined;
-    };
-    this.highlightRange = function(tower) {
-        let point = tower.point;
-        this.context.strokeStyle = "SteelBlue";
-        this.context.fillStyle = "rgba(30, 144, 255, 0.20)";
-        this.context.beginPath();
-        this.context.ellipse(tower.point.x, tower.point.y, tower.range * 2,
-                             tower.range, 0, 0, 2 * Math.PI);
-        this.context.stroke();
-        this.context.fill();
     };
     this.init = function() {
         this.map.applyLevel({
@@ -180,7 +171,7 @@ function GameObj(canvas) {
             let tileCenter = this.map.gridToTileCenter(mouseGridPos);
             let tower = this.getTowerAtPoint(tileCenter);
             if (tower)
-                this.highlightRange(tower);
+                tower.highlightRange();
         }
         for (let i = 0; i < this.waves.length; ++i) {
             let wave = this.waves[i];
