@@ -25,7 +25,7 @@ function TileSetObj(sprite) {
     return this;
 }
 
-function MapObj(tiles) {
+function MapObj(tiles, shape) {
     this.tiles = tiles;
     this.directions = {
         "N": (new PointObj(0, -1)).convert(),
@@ -33,10 +33,11 @@ function MapObj(tiles) {
         "E": (new PointObj(1, 0)).convert(),
         "W": (new PointObj(-1, 0)).convert(),
     };
-    this.isometricSize = this.tiles.getWidth() / 2;
+    this.shape = shape;
+    this.size = this.tiles.getWidth() / 2;
     this.mapArray = this.startPoint = this.initialHeading = undefined;
     this.gridToIso = function(gridPoint) {
-        return gridPoint.multi(this.isometricSize).convert();
+        return gridPoint.multi(this.size).convert();
     };
     this.applyLevel = function(level) {
         this.mapArray = level.mapArray;
@@ -48,19 +49,24 @@ function MapObj(tiles) {
         let iPoint, gridVal;
         for (x = 0; x < rowAmount; ++x) {
             for (y = 0; y < colAmount; ++y) {
-                iPoint = (new PointObj(y, x)).convert().multi(this.isometricSize);
+                iPoint = (new PointObj(y, x)).convert().multi(this.size);
                 gridVal = this.mapArray[x][y];
-                this.tiles.draw(iPoint.x - this.isometricSize, iPoint.y, gridVal);
+                this.tiles.draw(iPoint.x - this.size, iPoint.y, gridVal);
             }
         }
     };
+    this.highlightTile = function(gPoint) {
+        const iPoint = this.gridToIso(gPoint);
+        this.shape.draw(iPoint.x, iPoint.y, this.size, this.size,
+            "silver",  "rgba(255, 255, 255, 0.20)");
+    };
     this.gridToTileCenter = function(gridPoint) {
-        let iPoint = gridPoint.multi(this.isometricSize).convert();
-        return iPoint.add(0, this.isometricSize / 2);
+        let iPoint = gridPoint.multi(this.size).convert();
+        return iPoint.add(0, this.size / 2);
     };
     this.getGridPos = function(Point) {
         Point = Point.type == "Cartesian" ? Point : Point.convert();
-        return Point.fdiv(this.isometricSize);
+        return Point.fdiv(this.size);
     };
     this.getNewHeading = function(gridPos, heading) {
         let gridVal = this.mapArray[gridPos.y][gridPos.x]

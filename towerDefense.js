@@ -10,10 +10,11 @@ function GameObj(canvas) {
         "slime": new SpriteObj(this.context, "sprites/SlimeIso.png", 4, 4),
         "balls": new SpriteObj(this.context, "sprites/Energy Ball.png", 8, 12),
     };
-    this.map = new MapObj(new TileSetObj(this.sprites["roads"]));
     this.towerMenu = new MenuDisplayObj(
         this.sprites["towers"], new PointObj(20, 380), new PointObj(30, 0));
-    this.isometricSize = this.map.isometricSize;
+    this.map = new MapObj(
+        new TileSetObj(this.sprites["roads"]),
+        new IsoTangle(this.context));
     this.waves = [], this.towers = [];
     // 62.5 - 25, avg44
     this.towerVariations = [
@@ -103,19 +104,6 @@ function GameObj(canvas) {
         }
         this.clickedTower = undefined;
     };
-    this.highlightTile = function(gPoint) {
-        let iPoint = this.map.gridToIso(gPoint);
-        this.context.strokeStyle = "silver";
-        this.context.fillStyle = "rgba(255, 255, 255, 0.20)";
-        this.context.beginPath();
-        this.context.moveTo(iPoint.x, iPoint.y);
-        this.context.lineTo(iPoint.x + 50, iPoint.y + 25);
-        this.context.lineTo(iPoint.x, iPoint.y + 50);
-        this.context.lineTo(iPoint.x - 50, iPoint.y + 25);
-        this.context.closePath();
-        this.context.stroke();
-        this.context.fill();
-    };
     this.highlightRange = function(tower) {
         let point = tower.point;
         this.context.strokeStyle = "SteelBlue";
@@ -150,7 +138,7 @@ function GameObj(canvas) {
     };
     this.update = function() {
         for (wave of this.waves) {
-            wave.update(this.frame, this.isometricSize,
+            wave.update(this.frame, this.map.size,
                         this.getNewCreepHeading.bind(this), this.map.directions);
         }
         for(tower of this.towers) {
@@ -188,7 +176,7 @@ function GameObj(canvas) {
         this.map.draw();
         let mouseGridPos = this.mouseToGrid();
         if (this.map.isMap(mouseGridPos)) {
-            this.highlightTile(mouseGridPos);
+            this.map.highlightTile(mouseGridPos);
             let tileCenter = this.map.gridToTileCenter(mouseGridPos);
             let tower = this.getTowerAtPoint(tileCenter);
             if (tower)
