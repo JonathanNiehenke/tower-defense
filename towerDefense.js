@@ -58,7 +58,7 @@ function GameObj(canvas) {
     this.mouseToGrid = function() {
         let iMousePoint = new PointObj(this.mousePos.x - this.canvas.width / 2,
                                        this.mousePos.y, "isometric");
-        return this.map.getGridPos(iMousePoint);
+        return this.map.gridPosAt(iMousePoint);
     };
     this.mouseMove = function(e) {
         let rect = canvas.getBoundingClientRect();
@@ -81,10 +81,9 @@ function GameObj(canvas) {
                 this.towerVariations, new IsoCircle(this.context), false,
                 this.sprites.balls);
         }
-        else if (this.map.isMap(mouseGridPos) &&
-                 this.map.getGridVal(mouseGridPos) === 0)
+        else if (this.map.isMap(mouseGridPos))
         {
-            let tileCenter = this.map.gridToTileCenter(mouseGridPos);
+            let tileCenter = this.map.centerOfTileAt(mouseGridPos);
             let tower = this.getTowerAtPoint(tileCenter);
             if (tower)
                 tower.upgrade();
@@ -92,10 +91,10 @@ function GameObj(canvas) {
     };
     this.mouseUp = function() {
         let mouseGridPos = this.mouseToGrid();
-        if (this.clickedTower !== undefined && this.map.isMap(mouseGridPos) &&
-            this.map.getGridVal(mouseGridPos) === 0)
+        if (this.clickedTower !== undefined &&
+            this.map.tileValueAt(mouseGridPos) === 0)
         {
-            let tileCenter = this.map.gridToTileCenter(mouseGridPos);
+            let tileCenter = this.map.centerOfTileAt(mouseGridPos);
             let tower = this.getTowerAtPoint(tileCenter);
             if (!tower) {
                 this.clickedTower.setPoint(tileCenter);
@@ -124,8 +123,7 @@ function GameObj(canvas) {
         this.canvas.addEventListener("mouseup", this.mouseUp.bind(this));
     };
     this.getNewCreepHeading = function(creep) {
-        let gridPos = this.map.getGridPos(creep.point);
-        return this.map.getNewHeading(gridPos, creep.heading);
+        return this.map.heading(creep.point, creep.heading);
     };
     this.update = function() {
         for (wave of this.waves) {
@@ -167,8 +165,8 @@ function GameObj(canvas) {
         this.map.draw();
         let mouseGridPos = this.mouseToGrid();
         if (this.map.isMap(mouseGridPos)) {
-            this.map.highlightTile(mouseGridPos);
-            let tileCenter = this.map.gridToTileCenter(mouseGridPos);
+            this.map.highlightTileAt(mouseGridPos);
+            let tileCenter = this.map.centerOfTileAt(mouseGridPos);
             let tower = this.getTowerAtPoint(tileCenter);
             if (tower)
                 tower.highlightRange();
