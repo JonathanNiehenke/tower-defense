@@ -1,30 +1,3 @@
-function TileSetObj(sprite) {
-    this.sprite = sprite;
-    this.tileMovement = [
-        undefined,
-        undefined,
-        (H) => { return H == "N" ? "N" : "S"; },
-        (H) => { return H == "E" ? "E" : "W"; },
-        (H) => { return H == "S" ? "E" : "N"; },
-        (H) => { return H == "S" ? "W" : "N"; },
-        (H) => { return H == "N" ? "E" : "S"; },
-        (H) => { return H == "N" ? "W" : "S"; },
-    ];
-    this.getWidth = function() {
-        return this.sprite.width;
-    };
-    this.getHeight = function() {
-        return this.sprite.height;
-    };
-    this.draw = function(x, y, tileVal) {
-        this.sprite.draw(tileVal % 4, Math.floor(tileVal / 4), x, y);
-    };
-    this.movement = function(tileVal, heading) {
-        return this.tileMovement[tileVal](heading);
-    };
-    return this;
-}
-
 function MapObj(tiles, shape) {
     this.tiles = tiles;
     this.directions = {
@@ -81,6 +54,30 @@ function MapObj(tiles, shape) {
     };
     this.getTilesHeight = function() {
       return this.tiles.getHeight();  
+function TileSetObj(sprite) {
+    this.sprite = sprite;
+    this.tileMovement = [
+        undefined,
+        undefined,
+        (H) => { return H == "N" ? "N" : "S"; },
+        (H) => { return H == "E" ? "E" : "W"; },
+        (H) => { return H == "S" ? "E" : "N"; },
+        (H) => { return H == "S" ? "W" : "N"; },
+        (H) => { return H == "N" ? "E" : "S"; },
+        (H) => { return H == "N" ? "W" : "S"; },
+    ];
+    this.getWidth = function() {
+        return this.sprite.width;
+    };
+    this.getHeight = function() {
+        return this.sprite.height;
+    };
+    this.draw = function(x, y, tileVal) {
+        this.sprite.draw(tileVal % 4, Math.floor(tileVal / 4), x, y);
+    };
+    this.movement = function(tileVal, heading) {
+        return this.tileMovement[tileVal](heading);
     };
     return this;
 }
+
