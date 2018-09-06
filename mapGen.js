@@ -11,14 +11,14 @@ function MapObj(tiles, shape) {
     this.mapArray = this.startPoint = this.initialHeading = undefined;
     this.applyLevel = function(level) {
         this.mapArray = level.mapArray;
-        this.startPoint = this.centerOfTileAt(level.startPoint);
+        this.startPoint = this.centerOfTileAt(level.startTile.multi(this.size));
         this.initialHeading = level.initialHeading;
     };
-    this.centerOfTileAt = function(gridPoint) {
-        return this.topOfTileAt(gridPoint).add(0, this.size / 2);
+    this.centerOfTileAt = function(isoPoint) {
+        return this.topOfTileAt(isoPoint).add(0, this.size / 2);
     };
-    this.topOfTileAt = function(gridPoint) {
-        return gridPoint.multi(this.size).convert();
+    this.topOfTileAt = function(isoPoint) {
+        return this.gridPosAt(isoPoint).multi(this.size).convert();
     };
     this.draw = function() {
         let rowAmount = this.mapArray.length, colAmount = this.mapArray[0].length;
@@ -41,13 +41,15 @@ function MapObj(tiles, shape) {
         return Point.fdiv(this.size);
     };
     this.heading = function(point, heading) {
-        const tileValue = this.tileValueAt(this.gridPosAt(point));
+        const tileValue = this.tileValueAt(point);
         return this.tiles.movement(tileValue, heading);
     };
-    this.tileValueAt = function(gridPos) {
-        return this.mapArray[gridPos.y][gridPos.x];
+    this.tileValueAt = function(Point) {
+        let gridPoint = this.gridPosAt(Point);
+        return this.mapArray[gridPoint.y][gridPoint.x];
     };
-    this.isMap = function(gridPoint) {
+    this.isMap = function(isoPoint) {
+        let gridPoint = this.gridPosAt(isoPoint);
         try { return this.mapArray[gridPoint.y][gridPoint.x] !== undefined; }
         catch (e) { return false; }  // caused by first index
     };

@@ -55,10 +55,9 @@ function GameObj(canvas) {
         {"damage": 4, "range": 80, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8},
         {"damage": 4, "range": 100, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8},
     ];
-    this.mouseToGrid = function() {
-        let iMousePoint = new PointObj(this.mousePos.x - this.canvas.width / 2,
-                                       this.mousePos.y, "isometric");
-        return this.map.gridPosAt(iMousePoint);
+    this.mouseToIso = function() {
+        return new PointObj(this.mousePos.x - this.canvas.width / 2,
+            this.mousePos.y, "isometric");
     };
     this.mouseMove = function(e) {
         let rect = canvas.getBoundingClientRect();
@@ -73,7 +72,6 @@ function GameObj(canvas) {
     };
     this.mouseDown = function() {
         let clicked = this.towerMenu.cellClicked(this.mousePos);
-        let mouseGridPos = this.mouseToGrid();
         if (clicked.cell.y === 0 && clicked.cell.x >= 0 && clicked.cell.x < 9)
         {
             this.clickedTower = new TowerObj(
@@ -81,20 +79,18 @@ function GameObj(canvas) {
                 this.towerVariations, new IsoCircle(this.context), false,
                 this.sprites.balls);
         }
-        else if (this.map.isMap(mouseGridPos))
-        {
-            let tileCenter = this.map.centerOfTileAt(mouseGridPos);
+        else if (this.map.isMap(this.mouseToIso())) {
+            let tileCenter = this.map.centerOfTileAt(this.mouseToIso());
             let tower = this.getTowerAtPoint(tileCenter);
             if (tower)
                 tower.upgrade();
         }
     };
     this.mouseUp = function() {
-        let mouseGridPos = this.mouseToGrid();
         if (this.clickedTower !== undefined &&
-            this.map.tileValueAt(mouseGridPos) === 0)
+            this.map.tileValueAt(this.mouseToIso()) === 0)
         {
-            let tileCenter = this.map.centerOfTileAt(mouseGridPos);
+            let tileCenter = this.map.centerOfTileAt(this.mouseToIso());
             let tower = this.getTowerAtPoint(tileCenter);
             if (!tower) {
                 this.clickedTower.setPoint(tileCenter);
@@ -115,7 +111,7 @@ function GameObj(canvas) {
                 [0, 0, 0, 2, 0, 0, 0],
                 [3, 3, 3, 5, 0, 0, 0]
             ],
-            "startPoint": new PointObj(0, 6),
+            "startTile": new PointObj(0, 6),
             "initialHeading": "E",
         });
         this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
@@ -163,10 +159,9 @@ function GameObj(canvas) {
             this.towerMenu.draw(6, i*3, new PointObj(i, 0));
         this.context.translate(this.canvas.width / 2, 0);
         this.map.draw();
-        let mouseGridPos = this.mouseToGrid();
-        if (this.map.isMap(mouseGridPos)) {
-            this.map.highlightTileAt(mouseGridPos);
-            let tileCenter = this.map.centerOfTileAt(mouseGridPos);
+        if (this.map.isMap(this.mouseToIso())) {
+            this.map.highlightTileAt(this.mouseToIso());
+            let tileCenter = this.map.centerOfTileAt(this.mouseToIso());
             let tower = this.getTowerAtPoint(tileCenter);
             if (tower)
                 tower.highlightRange();
