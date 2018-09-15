@@ -6,7 +6,7 @@ function GameObj(canvas) {
     this.clickedTower = undefined;
     this.sprites = {
         "towers": new SpriteObj(this.context, "sprites/Towers.png", 27, 8),
-        "roads": new SpriteObj(this.context,  "sprites/tileSheet.png", 2, 4),
+        "roads": new SpriteObj(this.context,  "sprites/IsoRoadSet_Kenney.png", 2, 4),
         "slime": new SpriteObj(this.context, "sprites/SlimeIso.png", 4, 4),
         "balls": new SpriteObj(this.context, "sprites/Energy Ball.png", 8, 12),
     };
