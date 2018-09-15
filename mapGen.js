@@ -8,9 +8,10 @@ function MapObj(tiles, shape) {
     };
     this.shape = shape;
     this.size = this.tiles.getWidth() / 2;
-    this.mapArray = this.startPoint = this.initialHeading = undefined;
+    this.structure = new MapStructureObj();
+    this.startPoint = this.initialHeading = undefined;
     this.applyLevel = function(level) {
-        this.mapArray = level.mapArray;
+        this.structure.new(level.mapArray);
         this.startPoint = this.centerOfTileAt(level.startTile.multi(this.size));
         this.initialHeading = level.initialHeading;
     };
@@ -21,14 +22,9 @@ function MapObj(tiles, shape) {
         return this.gridPosAt(isoPoint).multi(this.size).convert();
     };
     this.draw = function() {
-        let rowAmount = this.mapArray.length, colAmount = this.mapArray[0].length;
-        let iPoint, gridVal;
-        for (x = 0; x < rowAmount; ++x) {
-            for (y = 0; y < colAmount; ++y) {
-                iPoint = (new PointObj(y, x)).convert().multi(this.size);
-                gridVal = this.mapArray[x][y];
-                this.tiles.draw(iPoint.x - this.size, iPoint.y, gridVal);
-            }
+        for (const [point, val] of this.structure.iter()) {
+            const iPoint = point.convert().multi(this.size);
+            this.tiles.draw(iPoint.x - this.size, iPoint.y, val);
         }
     };
     this.highlightTileAt = function(gridPoint) {
@@ -41,19 +37,32 @@ function MapObj(tiles, shape) {
         return Point.fdiv(this.size);
     };
     this.heading = function(point, heading) {
-        const tileValue = this.tileValueAt(point);
-        return this.tiles.movement(tileValue, heading);
+        return this.tiles.movement(this.tileValueAt(point), heading);
     };
-    this.tileValueAt = function(Point) {
-        let gridPoint = this.gridPosAt(Point);
-        return this.mapArray[gridPoint.y][gridPoint.x];
+    this.tileValueAt = function(isoPoint) {
+        return this.structure.value(this.gridPosAt(isoPoint));
     };
     this.isMap = function(isoPoint) {
-        let gridPoint = this.gridPosAt(isoPoint);
-        try { return this.mapArray[gridPoint.y][gridPoint.x] !== undefined; }
-        catch (e) { return false; }  // caused by first index
+        return this.structure.value(this.gridPosAt(isoPoint)) !== undefined;
     };
     return this;
+}
+
+function MapStructureObj() {
+    this.structure = [];
+    this.new = function(structure) {
+        this.structure = structure;
+    };
+    this.iter = function*() {
+        for (const [y, row] of this.structure.entries())
+            for (const [x, val] of row.entries())
+                yield [new PointObj(x, y), val];
+    };
+    this.value = function(point) {
+        try { return this.structure[point.y][point.x]; }
+        catch { return undefined; }
+    };
+    this.return;
 }
 
 function TileSetObj(sprite) {
