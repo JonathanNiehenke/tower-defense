@@ -18,13 +18,14 @@ function CreepObj(sprite, point, heading, health, shape, wavePos, creationFrame)
         this.point = this.point.add(heading.x, heading.y);
     };
     this.drawHealth = function(initHealth) {
-        const spacing = 5, width = 5;
+        const drawPos = this.point.floor(), spacing = 5, width = 5;
         this.shape.draw(
-            this.point.x - this.sprite.width / 2, this.point.y + spacing,
+            drawPos.x - this.sprite.width / 2, drawPos.y + spacing,
             this.sprite.width, width, "Black", this.health/initHealth);
     };
     this.draw = function() {
-        let drawPos = this.point.add(this.centerFeet.x, this.centerFeet.y);
+        const drawPos = this.point.add(
+            this.centerFeet.x, this.centerFeet.y).floor();
         this.sprite.draw(this.col, this.facing, drawPos.x, drawPos.y);
     };
     this.nextCol = function() {

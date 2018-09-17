@@ -54,6 +54,9 @@ function PointObj(x, y, type="Cartesian") {
         this.x=this.x / int;
         this.y=this.y / int;
     };
+    this.floor = function() {
+        return new PointObj(Math.floor(this.x), Math.floor(this.y), this.type);
+    };
     this.distFrom = function(point) {
         let difference = this.aSub(point.x, point.y);
          if (this.type === "Isometric")
