@@ -123,7 +123,7 @@ function GameObj(canvas) {
     };
     this.update = function() {
         for (wave of this.waves) {
-            wave.update(this.frame, this.map.size,
+            wave.update(this.frame, 20,
                         this.getNewCreepHeading.bind(this), this.map.directions);
         }
         for(tower of this.towers) {

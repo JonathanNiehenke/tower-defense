@@ -1,13 +1,13 @@
 function MapObj(tiles, shape) {
     this.tiles = tiles;
-    this.directions = {
-        "N": (new PointObj(0, -1)).convert(),
-        "S": (new PointObj(0, 1)).convert(),
-        "E": (new PointObj(1, 0)).convert(),
-        "W": (new PointObj(-1, 0)).convert(),
-    };
     this.shape = shape;
     this.size = this.tiles.getWidth() / 2;
+    this.directions = {
+        "N": (new PointObj(0, -this.size/20)).convert(),
+        "S": (new PointObj(0, this.size/20)).convert(),
+        "E": (new PointObj(this.size/20, 0)).convert(),
+        "W": (new PointObj(-this.size/20, 0)).convert(),
+    };
     this.structure = new MapStructureObj();
     this.startPoint = this.initialHeading = undefined;
     this.applyLevel = function(level) {
