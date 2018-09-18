@@ -15,12 +15,6 @@ function MapObj(tiles, shape) {
         this.startPoint = this.centerOfTileAt(this.toIso(level.startTile));
         this.initialHeading = level.initialHeading;
     };
-    this.centerOfTileAt = function(isoPoint) {
-        return this.topOfTileAt(isoPoint).add(0, this.size / 2);
-    };
-    this.topOfTileAt = function(isoPoint) {
-        return this.toIso(this.gridPosAt(isoPoint));
-    };
     this.draw = function() {
         for (const [point, val] of this.structure.iter()) {
             const iPoint = this.toIso(point);
@@ -32,21 +26,27 @@ function MapObj(tiles, shape) {
         this.shape.draw(iPoint.x, iPoint.y, this.size, this.size,
             "silver",  "rgba(255, 255, 255, 0.20)");
     };
-    this.gridPosAt = function(Point) {
-        Point = Point.type == "Cartesian" ? Point : Point.convert();
-        return Point.fdiv(this.size);
-    };
     this.heading = function(point, heading) {
         return this.tiles.movement(this.tileValueAt(point), heading);
     };
-    this.toIso = function(gridPoint) {
-        return gridPoint.multi(this.size).convert()
+    this.isMap = function(isoPoint) {
+        return this.tileValueAt(isoPoint) !== undefined;
     };
     this.tileValueAt = function(isoPoint) {
         return this.structure.value(this.gridPosAt(isoPoint));
     };
-    this.isMap = function(isoPoint) {
-        return this.structure.value(this.gridPosAt(isoPoint)) !== undefined;
+    this.centerOfTileAt = function(isoPoint) {
+        return this.topOfTileAt(isoPoint).add(0, this.size / 2);
+    };
+    this.topOfTileAt = function(isoPoint) {
+        return this.toIso(this.gridPosAt(isoPoint));
+    };
+    this.toIso = function(gridPoint) {
+        return gridPoint.multi(this.size).convert()
+    };
+    this.gridPosAt = function(Point) {
+        Point = Point.type == "Cartesian" ? Point : Point.convert();
+        return Point.fdiv(this.size);
     };
     return this;
 }
