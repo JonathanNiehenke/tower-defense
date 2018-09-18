@@ -12,18 +12,18 @@ function MapObj(tiles, shape) {
     this.startPoint = this.initialHeading = undefined;
     this.applyLevel = function(level) {
         this.structure.new(level.mapArray);
-        this.startPoint = this.centerOfTileAt(level.startTile.multi(this.size));
+        this.startPoint = this.centerOfTileAt(this.toIso(level.startTile));
         this.initialHeading = level.initialHeading;
     };
     this.centerOfTileAt = function(isoPoint) {
         return this.topOfTileAt(isoPoint).add(0, this.size / 2);
     };
     this.topOfTileAt = function(isoPoint) {
-        return this.gridPosAt(isoPoint).multi(this.size).convert();
+        return this.toIso(this.gridPosAt(isoPoint));
     };
     this.draw = function() {
         for (const [point, val] of this.structure.iter()) {
-            const iPoint = point.convert().multi(this.size);
+            const iPoint = this.toIso(point);
             this.tiles.draw(iPoint.x - this.size, iPoint.y, val);
         }
     };
@@ -38,6 +38,9 @@ function MapObj(tiles, shape) {
     };
     this.heading = function(point, heading) {
         return this.tiles.movement(this.tileValueAt(point), heading);
+    };
+    this.toIso = function(gridPoint) {
+        return gridPoint.multi(this.size).convert()
     };
     this.tileValueAt = function(isoPoint) {
         return this.structure.value(this.gridPosAt(isoPoint));
