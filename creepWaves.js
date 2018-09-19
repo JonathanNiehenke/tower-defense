@@ -11,10 +11,11 @@ function EnemeiesObj(healthBarShape) {
         this.updateWave();
     };
     this.updateWave = function() {
+        this.enemies = this.enemies.filter(creep => creep.health > 0);
         if (this.currentWave.amount)
             this.createCreep();
         else if (this.enemies.length == 0)
-            this.currentWave = this.waveInfo.pop();
+            this.currentWave = this.waveInfo.shift();
     };
     this.createCreep = function() {
         if (this.isSpaced()) {
@@ -49,12 +50,19 @@ function CreepObj(healthBarShape, {sprite, start, heading, speed, health}) {
     this.facing = this.changeFacing[this.heading];
     this.update = function(headingFunc, directions) {
         if (this.traveled % 20 < this.speed)
-            this.setHeading(headingFunc);
+            try { this.setHeading(headingFunc); }
+            catch (e) {this.updateCatch(e)}
         this.move(directions);
     }
     this.setHeading = function(headingFunc) {
         this.heading = headingFunc(this.point, this.heading);
         this.facing = this.changeFacing[this.heading];
+    };
+    this.updateCatch = function(error) {
+        if (error === "Off map")
+            this.health = 0;
+        else
+            throw error;
     };
     this.move = function(directions) {
         this.increment += this.speed;

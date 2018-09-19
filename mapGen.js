@@ -90,10 +90,10 @@ function TileSetObj(sprite) {
     this.movement = function(tileVal, heading) {
         try { return this.tileMovement[tileVal](heading); }
         catch (e) {
-            console.log(tileVal);
+            if (tileVal === undefined) throw "Off map";
+            else if (this.tileMovement[tileVal] == undefined) throw "Off path";
             throw e;
         }
     };
     return this;
 }
-

@@ -116,7 +116,13 @@ function GameObj(canvas) {
         let slime = this.sprites["slime"];
         this.enemies.newWaves([
             {"sprite": slime, "amount": 6, "start": this.map.start,
-             "heading": "E", "spacing": 20, "speed": 1, "health": 100},
+             "heading": "E", "spacing": 35, "speed": 1, "health": 100},
+            {"sprite": slime, "amount": 6, "start": this.map.start,
+             "heading": "E", "spacing": 20, "speed": 2, "health": 100},
+            {"sprite": slime, "amount": 6, "start": this.map.start,
+             "heading": "E", "spacing": 10, "speed": 1, "health": 100},
+            {"sprite": slime, "amount": 24, "start": this.map.start,
+             "heading": "E", "spacing": 10, "speed": 0.5, "health": 100},
         ]);
         this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
         this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
