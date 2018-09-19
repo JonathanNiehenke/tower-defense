@@ -1,25 +1,71 @@
-function CreepObj(sprite, point, heading, health, shape, wavePos, creationFrame) {
+function EnemeiesObj(healthBarShape) {
+    this.healthBarShape = healthBarShape;
+    this.waveInfo = this.enemies = [];
+    this.newWaves = function(waveInfo) {
+        this.waveInfo = waveInfo;
+        this.currentWave = this.waveInfo.shift();
+    };
+    this.update = function(headingFunc, directions) {
+        for (let creep of this.enemies)
+            creep.update(headingFunc, directions);
+        this.updateWave();
+    };
+    this.updateWave = function() {
+        if (this.currentWave.amount)
+            this.createCreep();
+        else if (this.enemies.length == 0)
+            this.currentWave = this.waveInfo.pop();
+    };
+    this.createCreep = function() {
+        if (this.isSpaced()) {
+            this.enemies.unshift(new CreepObj(
+                this.healthBarShape, this.currentWave));
+            --this.currentWave.amount;
+        }
+    };
+    this.isSpaced = function() {
+        if (this.enemies.length == 0) return true;
+        return this.enemies[0].traveled > this.currentWave.spacing;
+    }
+    this.draw = function() {
+        for (creep of this.enemies)
+            creep.drawHealth(this.currentWave.health);
+        for (creep of this.enemies)
+            creep.draw();
+    };
+    this.return;
+}
+
+function CreepObj(healthBarShape, {sprite, start, heading, speed, health}) {
+    this.healthBarShape = healthBarShape;
     this.sprite = sprite;
-    this.point = point;
+    this.point = start;
     this.heading = heading;
+    this.speed = speed;
     this.health = health;
-    this.shape = shape;
-    this.wavePos = wavePos;
-    this.creationFrame = creationFrame;
     this.centerFeet = new PointObj(-this.sprite.width / 2, -this.sprite.height);
-    this.col = 0;
+    this.col = this.traveled = 0;
     this.changeFacing = { "N": 0, "S": 1, "E": 2, "W": 3 };
     this.facing = this.changeFacing[this.heading];
-    this.setHeading = function(heading) {
-        this.heading = heading;
-        this.facing = this.changeFacing[heading];
+    this.update = function(headingFunc, directions) {
+        if (this.traveled % 20 == 0)
+            this.setHeading(headingFunc);
+        this.move(directions);
+    }
+    this.setHeading = function(headingFunc) {
+        this.heading = headingFunc(this.point, this.heading);
+        this.facing = this.changeFacing[this.heading];
     };
-    this.move = function(heading) {
-        this.point = this.point.add(heading.x, heading.y);
+    this.move = function(directions) {
+        this.increment += this.speed;
+        this.traveled += this.speed;
+        this.col = Math.floor(this.traveled / 5);
+        const trajectory = directions[this.heading].multi(this.speed);
+        this.point = this.point.add(trajectory.x, trajectory.y);
     };
     this.drawHealth = function(initHealth) {
         const drawPos = this.point.floor(), spacing = 5, width = 5;
-        this.shape.draw(
+        this.healthBarShape.draw(
             drawPos.x - this.sprite.width / 2, drawPos.y + spacing,
             this.sprite.width, width, "Black", this.health/initHealth);
     };
@@ -28,49 +74,5 @@ function CreepObj(sprite, point, heading, health, shape, wavePos, creationFrame)
             this.centerFeet.x, this.centerFeet.y).floor();
         this.sprite.draw(this.col, this.facing, drawPos.x, drawPos.y);
     };
-    this.nextCol = function() {
-        ++this.col;
-    };
 }
 
-function WaveObj(sprite, creationAmount, startingPoint, initHeading, spacing,
-    initHealth, healthShape)
-{
-    this.sprite = sprite;
-    this.creationAmount = creationAmount;
-    this.point = startingPoint;
-    this.initHeading = initHeading;
-    this.spacing = spacing;
-    this.initHealth = initHealth;
-    this.healthShape = healthShape;
-    this.created = 0;
-    this.creeps = [];
-    this.createCreep = function(frame) {
-        this.creeps.push(new CreepObj(
-            this.sprite, this.point, this.initHeading, this.initHealth,
-            this.healthShape, this.created++, frame));
-    };
-    this.update = function(frame, isometricSize, getNewHeading, directions) {
-        if (this.created < this.creationAmount && frame % this.spacing == 0)
-            this.createCreep(frame);
-        for (let i = 0; i < this.creeps.length; ++i) {
-            let creep = this.creeps[i];
-            if (creep.health <= 0) {
-                // Remove creep and prevent skipping the next creep
-                this.creeps.splice(i--, 1);
-                continue;
-            }
-            if (frame % 5 == 0)
-                creep.nextCol();
-            if ((frame - creep.creationFrame) % isometricSize == 0)
-                creep.setHeading(getNewHeading(creep));
-            creep.move(directions[creep.heading]);
-        }
-    };
-    this.draw = function() {
-        for (creep of this.creeps)
-            creep.drawHealth(this.initHealth);
-        for (creep of this.creeps)
-            creep.draw();
-    };
-}
