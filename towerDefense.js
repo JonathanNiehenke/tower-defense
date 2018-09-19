@@ -1,14 +1,13 @@
 function init() {
     let game = new GameObj(document.querySelector("CANVAS"));
     game.init();
-    setInterval(this.loop.bind(this), 28);
 }
 
 function GameObj(canvas) {
     this.canvas = canvas;
     this.context = canvas.getContext('2d');
     this.mousePos = new PointObj(-1, -1);
-    this.clickedTower = undefined;
+    this.clickedTower = this.animation = undefined;
     this.sprites = {
         "towers": new SpriteObj(this.context, "sprites/Towers.png", 27, 8),
         "roads": new SpriteObj(this.context,  "sprites/IsoRoadSet_Kenney.png", 2, 4),
@@ -88,9 +87,11 @@ function GameObj(canvas) {
         this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
         this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
         this.canvas.addEventListener("mouseup", this.mouseUp.bind(this));
+        this.animation = setInterval(this.loop.bind(this), 28);
     };
     this.loop = function() {
-        this.update();
+        try { this.update(); }
+        catch { this.end(); }
         this.draw();
     };
     this.update = function() {
@@ -162,6 +163,10 @@ function GameObj(canvas) {
         }
         return undefined;
     };
+    this.end = function() {
+        clearInterval(this.animation);
+        alert("Game Over");
+    }
     return this;
 }
 
