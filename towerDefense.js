@@ -1,3 +1,9 @@
+function init() {
+    let game = new GameObj(document.querySelector("CANVAS"));
+    game.init();
+    setInterval(this.loop.bind(this), 28);
+}
+
 function GameObj(canvas) {
     this.canvas = canvas;
     this.context = canvas.getContext('2d');
@@ -55,20 +61,65 @@ function GameObj(canvas) {
         {"damage": 4, "range": 80, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8},
         {"damage": 4, "range": 100, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8},
     ];
-    this.mouseToIso = function() {
-        return new PointObj(this.mousePos.x - this.canvas.width / 2,
-            this.mousePos.y, "isometric");
+    this.init = function() {
+        this.map.applyLevel({
+            "mapArray": [
+                [0, 6, 3, 3, 3, 7, 0],
+                [0, 2, 0, 0, 0, 4, 7],
+                [0, 2, 0, 0, 0, 0, 2],
+                [3, 5, 0, 6, 7, 0, 2],
+                [0, 0, 0, 2, 4, 3, 5],
+                [0, 0, 0, 2, 0, 0, 0],
+                [3, 3, 3, 5, 0, 0, 0]
+            ],
+            "startTile": new PointObj(0, 6),
+        });
+        let slime = this.sprites["slime"];
+        this.enemies.newWaves([
+            {"sprite": slime, "amount": 6, "start": this.map.start,
+             "heading": "E", "spacing": 35, "speed": 1, "health": 100},
+            {"sprite": slime, "amount": 6, "start": this.map.start,
+             "heading": "E", "spacing": 20, "speed": 2, "health": 100},
+            {"sprite": slime, "amount": 6, "start": this.map.start,
+             "heading": "E", "spacing": 10, "speed": 1, "health": 100},
+            {"sprite": slime, "amount": 24, "start": this.map.start,
+             "heading": "E", "spacing": 10, "speed": 0.5, "health": 100},
+        ]);
+        this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
+        this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
+        this.canvas.addEventListener("mouseup", this.mouseUp.bind(this));
+    };
+    this.loop = function() {
+        this.update();
+        this.draw();
+    };
+    this.update = function() {
+        this.enemies.update(this.map.heading.bind(this.map), this.map.directions);
+    };
+    this.draw = function() {
+        this.context.save();
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        for (let i = 0; i < 9; ++i)
+            this.towerMenu.draw(6, i*3, new PointObj(i, 0));
+        this.context.translate(this.canvas.width / 2, 0);
+        this.map.draw();
+        if (this.map.isMap(this.mouseToIso())) {
+            this.map.highlightTileAt(this.mouseToIso());
+            let tileCenter = this.map.centerOfTileAt(this.mouseToIso());
+            let tower = this.getTowerAtPoint(tileCenter);
+            if (tower)
+                tower.highlightRange();
+        }
+        this.enemies.draw();
+        for (tower of this.towers)
+            tower.draw();
+        this.context.restore();
+        if (this.clickedTower !== undefined)
+            this.clickedTower.draw(this.mousePos);
     };
     this.mouseMove = function(e) {
         let rect = canvas.getBoundingClientRect();
         this.mousePos.change(e.clientX - rect.x, e.clientY - rect.y);
-    };
-    this.getTowerAtPoint = function(point) {
-        for (let tower of this.towers) {
-            if (tower.point.equals(point.x, point.y))
-                return tower;
-        }
-        return undefined;
     };
     this.mouseDown = function() {
         let clicked = this.towerMenu.cellClicked(this.mousePos);
@@ -100,67 +151,17 @@ function GameObj(canvas) {
         }
         this.clickedTower = undefined;
     };
-    this.init = function() {
-        this.map.applyLevel({
-            "mapArray": [
-                [0, 6, 3, 3, 3, 7, 0],
-                [0, 2, 0, 0, 0, 4, 7],
-                [0, 2, 0, 0, 0, 0, 2],
-                [3, 5, 0, 6, 7, 0, 2],
-                [0, 0, 0, 2, 4, 3, 5],
-                [0, 0, 0, 2, 0, 0, 0],
-                [3, 3, 3, 5, 0, 0, 0]
-            ],
-            "startTile": new PointObj(0, 6),
-        });
-        let slime = this.sprites["slime"];
-        this.enemies.newWaves([
-            {"sprite": slime, "amount": 6, "start": this.map.start,
-             "heading": "E", "spacing": 35, "speed": 1, "health": 100},
-            {"sprite": slime, "amount": 6, "start": this.map.start,
-             "heading": "E", "spacing": 20, "speed": 2, "health": 100},
-            {"sprite": slime, "amount": 6, "start": this.map.start,
-             "heading": "E", "spacing": 10, "speed": 1, "health": 100},
-            {"sprite": slime, "amount": 24, "start": this.map.start,
-             "heading": "E", "spacing": 10, "speed": 0.5, "health": 100},
-        ]);
-        this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
-        this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
-        this.canvas.addEventListener("mouseup", this.mouseUp.bind(this));
+    this.mouseToIso = function() {
+        return new PointObj(this.mousePos.x - this.canvas.width / 2,
+            this.mousePos.y, "isometric");
     };
-    this.update = function() {
-        this.enemies.update(this.map.heading.bind(this.map), this.map.directions);
-    };
-    this.draw = function() {
-        this.context.save();
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        for (let i = 0; i < 9; ++i)
-            this.towerMenu.draw(6, i*3, new PointObj(i, 0));
-        this.context.translate(this.canvas.width / 2, 0);
-        this.map.draw();
-        if (this.map.isMap(this.mouseToIso())) {
-            this.map.highlightTileAt(this.mouseToIso());
-            let tileCenter = this.map.centerOfTileAt(this.mouseToIso());
-            let tower = this.getTowerAtPoint(tileCenter);
-            if (tower)
-                tower.highlightRange();
+    this.getTowerAtPoint = function(point) {
+        for (let tower of this.towers) {
+            if (tower.point.equals(point.x, point.y))
+                return tower;
         }
-        this.enemies.draw();
-        for (tower of this.towers)
-            tower.draw();
-        this.context.restore();
-        if (this.clickedTower !== undefined)
-            this.clickedTower.draw(this.mousePos);
-    };
-    this.loop = function() {
-        this.update();
-        this.draw();
+        return undefined;
     };
     return this;
 }
 
-function init() {
-    let game = new GameObj(document.querySelector("CANVAS"));
-    game.init();
-    setInterval(game.loop.bind(game), 30);
-}
