@@ -9,11 +9,9 @@ function MapObj(tiles, shape) {
         "W": (new PointObj(-this.size/20, 0)).convert(),
     };
     this.structure = new MapStructureObj();
-    this.startPoint = this.initialHeading = undefined;
     this.applyLevel = function(level) {
         this.structure.new(level.mapArray);
-        this.startPoint = this.centerOfTileAt(this.toIso(level.startTile));
-        this.initialHeading = level.initialHeading;
+        this.start = this.centerOfTileAt(this.toIso(level.startTile));
     };
     this.draw = function() {
         for (const [point, val] of this.structure.iter()) {
@@ -90,7 +88,11 @@ function TileSetObj(sprite) {
         this.sprite.draw(tileVal % 4, Math.floor(tileVal / 4), x, y);
     };
     this.movement = function(tileVal, heading) {
-        return this.tileMovement[tileVal](heading);
+        try { return this.tileMovement[tileVal](heading); }
+        catch (e) {
+            console.log(tileVal);
+            throw e;
+        }
     };
     return this;
 }

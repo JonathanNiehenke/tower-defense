@@ -1,7 +1,6 @@
 function GameObj(canvas) {
     this.canvas = canvas;
     this.context = canvas.getContext('2d');
-    this.frame = 0;
     this.mousePos = new PointObj(-1, -1);
     this.clickedTower = undefined;
     this.sprites = {
@@ -15,7 +14,8 @@ function GameObj(canvas) {
     this.map = new MapObj(
         new TileSetObj(this.sprites["roads"]),
         new IsoTangle(this.context));
-    this.waves = [], this.towers = [];
+    this.enemies = new EnemeiesObj(new HealthBar(this.context));
+    this.towers = [];
     // 62.5 - 25, avg44
     this.towerVariations = [
         // cannon
@@ -112,45 +112,18 @@ function GameObj(canvas) {
                 [3, 3, 3, 5, 0, 0, 0]
             ],
             "startTile": new PointObj(0, 6),
-            "initialHeading": "E",
         });
+        let slime = this.sprites["slime"];
+        this.enemies.newWaves([
+            {"sprite": slime, "amount": 6, "start": this.map.start,
+             "heading": "E", "spacing": 20, "speed": 1, "health": 100},
+        ]);
         this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
         this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
         this.canvas.addEventListener("mouseup", this.mouseUp.bind(this));
     };
-    this.getNewCreepHeading = function(creep) {
-        return this.map.heading(creep.point, creep.heading);
-    };
     this.update = function() {
-        for (wave of this.waves) {
-            wave.update(this.frame, 20,
-                        this.getNewCreepHeading.bind(this), this.map.directions);
-        }
-        for(tower of this.towers) {
-            for(wave of this.waves) {
-                for(creep of wave.creeps) {
-                    for (let particle of tower.emitter.getLiveParticles()) {
-                        if(creep.point.distFrom(particle.location) < tower.pSize) {
-                            particle.lifespan = 0;
-                            creep.health -= tower.damage;
-                        }
-                    }
-                    if(tower.point.distFrom(creep.point) < tower.range) {
-                        tower.setTarget(creep.point);
-                        let direction = creep.point.sub(
-                            tower.point.x, tower.point.y).normalize();
-                        tower.emitter.direction = direction.multi(tower.speed);
-                        if (tower.currentReload <= 0) {
-                            tower.emitter.addparticle();
-                            tower.currentReload = tower.reload;
-                        }
-                        break;
-                    }
-                }
-            }
-            --tower.currentReload;
-            tower.emitter.update();
-        }
+        this.enemies.update(this.map.heading.bind(this.map), this.map.directions);
     };
     this.draw = function() {
         this.context.save();
@@ -166,13 +139,7 @@ function GameObj(canvas) {
             if (tower)
                 tower.highlightRange();
         }
-        for (let i = 0; i < this.waves.length; ++i) {
-            let wave = this.waves[i];
-            if (wave.creeps.length > 0)
-                wave.draw(this.context);
-            else if (wave.created == wave.creationAmount)
-                this.waves.splice(i--, 1);  // Remove and prevent skipping
-        }
+        this.enemies.draw();
         for (tower of this.towers)
             tower.draw();
         this.context.restore();
@@ -180,18 +147,8 @@ function GameObj(canvas) {
             this.clickedTower.draw(this.mousePos);
     };
     this.loop = function() {
-        if (this.waves.length == 0 && this.frame % 50 == 0) {
-            let create = Math.floor(Math.random() * 7) + 4;  // 4 - 10
-            let spacing = Math.floor(Math.random() * 70) + 30;  // 30 - 99
-            let health = 250 / create;
-            let wave = new WaveObj( this.sprites["slime"], create,
-                this.map.startPoint, this.map.initialHeading, spacing, health,
-                new HealthBar(this.context));
-            this.waves.push(wave);
-        }
         this.update();
         this.draw();
-        ++this.frame;
     };
     return this;
 }
