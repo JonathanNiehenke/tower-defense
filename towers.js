@@ -1,7 +1,7 @@
 function DefenseNetworkObj(sprite, ballSprite, rangeShape) {
     this.sprite = sprite;
     this.ballSprite = ballSprite;
-    this.towers = [];
+    this.towers = {};
     this.rangeShape = rangeShape;
     this.towerVariations = [
         // cannon
@@ -42,31 +42,22 @@ function DefenseNetworkObj(sprite, ballSprite, rangeShape) {
         {"damage": 4, "range": 100, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8},
     ];
     this.draw = function() {
-        for (tower of this.towers)
-            tower.draw();
+        Object.values(this.towers).forEach(tower => tower.draw());
     };
     this.upgradeAt = function(point) {
-        if (this.towerAt(point) !== undefined)
-            tower.upgrade();
+        try { this.towers[point.toString()].upgrade(); }
+        catch (e) { if (!(e instanceof TypeError)) throw e; }
     };
     this.highlightRangeAt = function(point) {
-        const tower = this.towerAt(point);
-        if (tower !== undefined)
-            tower.highlightRange();
+        try { this.towers[point.toString()].highlightRange(); }
+        catch (e) { if (!(e instanceof TypeError)) throw e; }
     };
     this.place = function(towerType, point) {
-        if (this.towerAt(point) !== undefined) return;
+        if (this.towers[point.toString()] !== undefined) return;
         const type = towerType * 3;
-        towerVariation = this.towerVariations.slice(type, type + 3);
-        this.towers.push(new TowerObj(sprite, point, type, towerVariation,
-            this.rangeShape, ballSprite));
-    };
-    this.towerAt = function(point) {
-        for (let tower of this.towers) {
-            if (tower.point.equals(point.x, point.y))
-                return tower;
-        }
-        return undefined;
+        let towerVariation = this.towerVariations.slice(type, type + 3);
+        this.towers[point.toString()] = new TowerObj(sprite, point, type,
+            towerVariation, this.rangeShape, ballSprite);
     };
     return this;
 }

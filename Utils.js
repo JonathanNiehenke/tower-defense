@@ -76,6 +76,9 @@ function PointObj(x, y, type="Cartesian") {
         this.x = x;
         this.y = y;
     };
+    this.toString = function() {
+        return `${this.x}, ${this.y}`
+    };
     return this;
 }
 
