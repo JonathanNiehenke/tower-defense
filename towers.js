@@ -1,12 +1,82 @@
-function TowerObj(
-    sprite, point, type, variations, rangeShape, emitterOn, partSprite) {
+function DefenseNetworkObj(sprite, ballSprite, rangeShape) {
+    this.sprite = sprite;
+    this.ballSprite = ballSprite;
+    this.towers = [];
+    this.rangeShape = rangeShape;
+    this.towerVariations = [
+        // cannon
+        {"damage": 8, "range": 42, "pAmount": 1, "pSize": 25, "reload": 75, "speed": 6},
+        {"damage": 12, "range": 42, "pAmount": 1, "pSize": 25, "reload": 75, "speed": 6},
+        {"damage": 16, "range": 42, "pAmount": 1, "pSize": 25, "reload": 75, "speed": 6},
+        // flame
+        {"damage": 0.2, "range": 42, "pAmount": 20, "pSize": 10, "reload": 0, "speed": 6},
+        {"damage": 0.35, "range": 42, "pAmount": 20, "pSize": 10, "reload": 0, "speed": 6},
+        {"damage": 0.5, "range": 42, "pAmount": 20, "pSize": 10, "reload": 0, "speed": 6},
+        // tesla
+        {"damage": 0.3, "range": 42, "pAmount": 20, "pSize": 10, "reload": 0, "speed": 6},
+        {"damage": 0.3, "range": 52, "pAmount": 20, "pSize": 10, "reload": 0, "speed": 6},
+        {"damage": 0.3, "range": 62, "pAmount": 20, "pSize": 10, "reload": 0, "speed": 6},
+        // egg gun
+        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 25, "reload": 30, "speed": 2},
+        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 25, "reload": 25, "speed": 2},
+        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 25, "reload": 20, "speed": 2},
+        // machine gun
+        {"damage": 0.5, "range": 62, "pAmount": 6, "pSize": 10, "reload": 6, "speed": 6},
+        {"damage": 1.0, "range": 62, "pAmount": 6, "pSize": 10, "reload": 6, "speed": 6},
+        {"damage": 1.5, "range": 62, "pAmount": 6, "pSize": 10, "reload": 6, "speed": 6},
+        // untitled
+        {"damage": 8, "range": 62, "pAmount": 6, "pSize": 8, "reload": 15, "speed": 2},
+        {"damage": 8, "range": 62, "pAmount": 6, "pSize": 8, "reload": 15, "speed": 4},
+        {"damage": 8, "range": 62, "pAmount": 6, "pSize": 8, "reload": 15, "speed": 6},
+        // missile
+        {"damage": 3, "range": 80, "pAmount": 6, "pSize": 25, "reload": 30, "speed": 12},
+        {"damage": 3, "range": 120, "pAmount": 6, "pSize": 25, "reload": 30, "speed": 12},
+        {"damage": 3, "range": 160, "pAmount": 6, "pSize": 25, "reload": 30, "speed": 12},
+        // shotgun
+        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 25, "reload": 30, "speed": 5},
+        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 30, "reload": 30, "speed": 5},
+        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 35, "reload": 30, "speed": 5},
+        // untitled2
+        {"damage": 4, "range": 60, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8},
+        {"damage": 4, "range": 80, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8},
+        {"damage": 4, "range": 100, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8},
+    ];
+    this.draw = function() {
+        for (tower of this.towers)
+            tower.draw();
+    };
+    this.upgradeAt = function(point) {
+        if (this.towerAt(point) !== undefined)
+            tower.upgrade();
+    };
+    this.highlightRangeAt = function(point) {
+        const tower = this.towerAt(point);
+        if (tower !== undefined)
+            tower.highlightRange();
+    };
+    this.place = function(towerType, point) {
+        if (this.towerAt(point) !== undefined) return;
+        const type = towerType * 3;
+        towerVariation = this.towerVariations.slice(type, type + 3);
+        this.towers.push(new TowerObj(sprite, point, type, towerVariation,
+            this.rangeShape, ballSprite));
+    };
+    this.towerAt = function(point) {
+        for (let tower of this.towers) {
+            if (tower.point.equals(point.x, point.y))
+                return tower;
+        }
+        return undefined;
+    };
+    return this;
+}
+
+function TowerObj(sprite, point, type, variations, rangeShape, partSprite) {
     this.sprite = sprite;
     this.point = point;
     this.type = type;
-    this.variations = variations.slice(type, type + 3);
-    this.rangeShape = rangeShape;
-    this.isEmitterOn = emitterOn;
-    this.emitter = new Emitter(this.point, new PointObj(0, 0), 80,
+    this.variations = variations;
+    this.emitter = new Emitter(point, new PointObj(0, 0), 80,
         this.variations[0].pAmount, partSprite);
     this.centerFeet = new PointObj(this.sprite.width / 2, this.sprite.height);
     this.level = 0;
@@ -16,17 +86,14 @@ function TowerObj(
     this.reload = this.currentReload = this.variations[this.level].reload;
     this.speed = this.variations[this.level].speed;
     this.col = 6;
-    this.draw = function(point) {
-        let drawPos = ((point === undefined)
-            ? this.point.sub(this.centerFeet.x, this.centerFeet.y)
-            : this.point.add(point.x, point.y));
+    this.draw = function() {
+        let drawPos = this.point.sub(this.centerFeet.x, this.centerFeet.y);
         this.sprite.draw(
             this.col, this.type + this.level, drawPos.x, drawPos.y);
-        if (this.isEmitterOn)
-            this.emitter.draw();
+        this.emitter.draw();
     };
     this.highlightRange = function() {
-        this.rangeShape.draw(this.point.x, this.point.y, this.range, undefined,
+        rangeShape.draw(this.point.x, this.point.y, this.range, undefined,
             "SteelBlue",  "rgba(30, 144, 255, 0.20)")
     };
     this.upgrade = function() {

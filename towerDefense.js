@@ -18,46 +18,9 @@ function GameObj(canvas) {
         new TileSetObj(this.sprites["roads"]),
         new IsoTangle(this.context));
     this.enemies = new EnemeiesObj(new HealthBar(this.context));
-    this.towers = [];
+    this.defense = new DefenseNetworkObj(
+        this.sprites.towers, this.sprites.balls, new IsoCircle(this.context));
     // 62.5 - 25, avg44
-    this.towerVariations = [
-        // cannon
-        {"damage": 8, "range": 42, "pAmount": 1, "pSize": 25, "reload": 75, "speed": 6},
-        {"damage": 12, "range": 42, "pAmount": 1, "pSize": 25, "reload": 75, "speed": 6},
-        {"damage": 16, "range": 42, "pAmount": 1, "pSize": 25, "reload": 75, "speed": 6},
-        // flame
-        {"damage": 0.2, "range": 42, "pAmount": 20, "pSize": 10, "reload": 0, "speed": 6},
-        {"damage": 0.35, "range": 42, "pAmount": 20, "pSize": 10, "reload": 0, "speed": 6},
-        {"damage": 0.5, "range": 42, "pAmount": 20, "pSize": 10, "reload": 0, "speed": 6},
-        // tesla
-        {"damage": 0.3, "range": 42, "pAmount": 20, "pSize": 10, "reload": 0, "speed": 6},
-        {"damage": 0.3, "range": 52, "pAmount": 20, "pSize": 10, "reload": 0, "speed": 6},
-        {"damage": 0.3, "range": 62, "pAmount": 20, "pSize": 10, "reload": 0, "speed": 6},
-        // egg gun
-        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 25, "reload": 30, "speed": 2},
-        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 25, "reload": 25, "speed": 2},
-        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 25, "reload": 20, "speed": 2},
-        // machine gun
-        {"damage": 0.5, "range": 62, "pAmount": 6, "pSize": 10, "reload": 6, "speed": 6},
-        {"damage": 1.0, "range": 62, "pAmount": 6, "pSize": 10, "reload": 6, "speed": 6},
-        {"damage": 1.5, "range": 62, "pAmount": 6, "pSize": 10, "reload": 6, "speed": 6},
-        // untitled
-        {"damage": 8, "range": 62, "pAmount": 6, "pSize": 8, "reload": 15, "speed": 2},
-        {"damage": 8, "range": 62, "pAmount": 6, "pSize": 8, "reload": 15, "speed": 4},
-        {"damage": 8, "range": 62, "pAmount": 6, "pSize": 8, "reload": 15, "speed": 6},
-        // missile
-        {"damage": 3, "range": 80, "pAmount": 6, "pSize": 25, "reload": 30, "speed": 12},
-        {"damage": 3, "range": 120, "pAmount": 6, "pSize": 25, "reload": 30, "speed": 12},
-        {"damage": 3, "range": 160, "pAmount": 6, "pSize": 25, "reload": 30, "speed": 12},
-        // shotgun
-        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 25, "reload": 30, "speed": 5},
-        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 30, "reload": 30, "speed": 5},
-        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 35, "reload": 30, "speed": 5},
-        // untitled2
-        {"damage": 4, "range": 60, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8},
-        {"damage": 4, "range": 80, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8},
-        {"damage": 4, "range": 100, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8},
-    ];
     this.init = function() {
         this.map.applyLevel({
             "mapArray": [
@@ -82,6 +45,9 @@ function GameObj(canvas) {
             {"sprite": slime, "amount": 24, "start": this.map.start,
              "heading": "E", "spacing": 10, "speed": 0.5, "health": 100},
         ]);
+        let point = this.map.centerOfTileAt(
+            this.map.toIso(new PointObj(2, 2)));
+        this.defense.place(6, point);
         this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
         this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
         this.canvas.addEventListener("mouseup", this.mouseUp.bind(this));
@@ -102,14 +68,11 @@ function GameObj(canvas) {
         this.map.draw();
         if (this.map.isMap(this.mouseToIso())) {
             this.map.highlightTileAt(this.mouseToIso());
-            let tileCenter = this.map.centerOfTileAt(this.mouseToIso());
-            let tower = this.getTowerAtPoint(tileCenter);
-            if (tower)
-                tower.highlightRange();
+            this.defense.highlightRangeAt(
+                this.map.centerOfTileAt(this.mouseToIso()));
         }
         this.enemies.draw();
-        for (tower of this.towers)
-            tower.draw();
+        this.defense.draw();
         this.context.restore();
     };
     this.mouseMove = function(e) {
@@ -117,25 +80,14 @@ function GameObj(canvas) {
         this.mousePos.change(e.clientX - rect.x, e.clientY - rect.y);
     };
     this.mouseDown = function() {
-        if (this.map.isMap(this.mouseToIso())) {
-            let tileCenter = this.map.centerOfTileAt(this.mouseToIso());
-            let tower = this.getTowerAtPoint(tileCenter);
-            if (tower)
-                tower.upgrade();
-        }
+        if (this.map.isMap(this.mouseToIso()))
+            this.defense.upgradeAt(this.map.centerOfTileAt(this.mouseToIso()));
     };
     this.mouseUp = function() {
     };
     this.mouseToIso = function() {
         return new PointObj(this.mousePos.x - this.canvas.width / 2,
             this.mousePos.y, "isometric");
-    };
-    this.getTowerAtPoint = function(point) {
-        for (let tower of this.towers) {
-            if (tower.point.equals(point.x, point.y))
-                return tower;
-        }
-        return undefined;
     };
     this.end = function() {
         clearInterval(this.animation);
