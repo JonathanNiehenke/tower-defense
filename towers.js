@@ -71,15 +71,12 @@ function TowerObj(sprite, point, type, variations, rangeShape, partSprite) {
     this.point = point;
     this.type = type;
     this.variations = variations;
-    this.emitter = new Emitter(point, new PointObj(0, 0), 80,
-        this.variations[0].pAmount, partSprite);
-    this.centerFeet = new PointObj(this.sprite.width / 2, this.sprite.height);
     this.level = 0;
-    this.damage = this.variations[this.level].damage;
-    this.pSize = this.variations[this.level].pSize;
-    this.range = this.variations[this.level].range;
-    this.reload = this.currentReload = this.variations[this.level].reload;
-    this.speed = this.variations[this.level].speed;
+    this.attributes = this.variations[this.level];
+    this.emitter = new Emitter(point, new PointObj(0, 0), 80,
+        this.attributes.pAmount, partSprite);
+    this.centerFeet = new PointObj(this.sprite.width / 2, this.sprite.height);
+    this.currentReload = this.attributes.reload;
     this.col = 6;
     this.draw = function() {
         let drawPos = this.point.sub(this.centerFeet.x, this.centerFeet.y);
@@ -88,32 +85,23 @@ function TowerObj(sprite, point, type, variations, rangeShape, partSprite) {
         this.emitter.draw();
     };
     this.highlightRange = function() {
-        rangeShape.draw(this.point.x, this.point.y, this.range, undefined,
+        rangeShape.draw(
+            this.point.x, this.point.y, this.attributes.range, undefined,
             "SteelBlue",  "rgba(30, 144, 255, 0.20)")
     };
     this.upgrade = function() {
         this.level += this.level < 2 ? 1 : 0;
-        this.damage = this.variations[this.level].damage;
-        this.pSize = this.variations[this.level].pSize;
-        this.range = this.variations[this.level].range;
-        this.reload = this.variations[this.level].reload;
-        this.speed = this.variations[this.level].speed;
-    };
-    this.setPoint = function(point) {
-        this.point = point;
-        this.emitter.location = point;
+        this.attributes = this.variations[this.level];
     };
     this.fireUpon = function(enemyPositions) {
         for (const enemyPos of enemyPositions()) {
-            if (this.point.distFrom(enemyPos) <= this.range) {
-                console.log(enemyPos);
+            if (this.point.distFrom(enemyPos) <= this.attributes.range) {
                 this.fireAt(enemyPos);
                 break;
             }
         }
     }
     this.fireAt = function(point) {
-        this.target = point;
         this.setBarrelAngle(this.toDegree(
             Math.atan2(this.point.y - point.y, this.point.x - point.x)));
     };
