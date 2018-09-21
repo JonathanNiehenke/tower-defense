@@ -7,15 +7,13 @@ function GameObj(canvas) {
     this.canvas = canvas;
     this.context = canvas.getContext('2d');
     this.mousePos = new PointObj(-1, -1);
-    this.clickedTower = this.animation = undefined;
+    this.animation = undefined;
     this.sprites = {
         "towers": new SpriteObj(this.context, "sprites/Towers.png", 27, 8),
         "roads": new SpriteObj(this.context,  "sprites/IsoRoadSet_Kenney.png", 2, 4),
         "slime": new SpriteObj(this.context, "sprites/SlimeIso.png", 4, 4),
         "balls": new SpriteObj(this.context, "sprites/Energy Ball.png", 8, 12),
     };
-    this.towerMenu = new MenuDisplayObj(
-        this.sprites["towers"], new PointObj(20, 380), new PointObj(30, 0));
     this.map = new MapObj(
         new TileSetObj(this.sprites["roads"]),
         new IsoTangle(this.context));
@@ -100,8 +98,6 @@ function GameObj(canvas) {
     this.draw = function() {
         this.context.save();
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        for (let i = 0; i < 9; ++i)
-            this.towerMenu.draw(6, i*3, new PointObj(i, 0));
         this.context.translate(this.canvas.width / 2, 0);
         this.map.draw();
         if (this.map.isMap(this.mouseToIso())) {
@@ -115,23 +111,13 @@ function GameObj(canvas) {
         for (tower of this.towers)
             tower.draw();
         this.context.restore();
-        if (this.clickedTower !== undefined)
-            this.clickedTower.draw(this.mousePos);
     };
     this.mouseMove = function(e) {
         let rect = canvas.getBoundingClientRect();
         this.mousePos.change(e.clientX - rect.x, e.clientY - rect.y);
     };
     this.mouseDown = function() {
-        let clicked = this.towerMenu.cellClicked(this.mousePos);
-        if (clicked.cell.y === 0 && clicked.cell.x >= 0 && clicked.cell.x < 9)
-        {
-            this.clickedTower = new TowerObj(
-                this.sprites["towers"], clicked.innerPos, clicked.cell.x * 3,
-                this.towerVariations, new IsoCircle(this.context), false,
-                this.sprites.balls);
-        }
-        else if (this.map.isMap(this.mouseToIso())) {
+        if (this.map.isMap(this.mouseToIso())) {
             let tileCenter = this.map.centerOfTileAt(this.mouseToIso());
             let tower = this.getTowerAtPoint(tileCenter);
             if (tower)
@@ -139,18 +125,6 @@ function GameObj(canvas) {
         }
     };
     this.mouseUp = function() {
-        if (this.clickedTower !== undefined &&
-            this.map.tileValueAt(this.mouseToIso()) === 0)
-        {
-            let tileCenter = this.map.centerOfTileAt(this.mouseToIso());
-            let tower = this.getTowerAtPoint(tileCenter);
-            if (!tower) {
-                this.clickedTower.setPoint(tileCenter);
-                this.clickedTower.isEmitterOn = true;
-                this.towers.push(this.clickedTower);
-            }
-        }
-        this.clickedTower = undefined;
     };
     this.mouseToIso = function() {
         return new PointObj(this.mousePos.x - this.canvas.width / 2,
