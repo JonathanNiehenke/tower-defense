@@ -41,6 +41,10 @@ function DefenseNetworkObj(sprite, ballSprite, rangeShape) {
         {"damage": 4, "range": 80, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8},
         {"damage": 4, "range": 100, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8},
     ];
+    this.fireUpon = function(enemyPositions) {
+        for (let tower of Object.values(this.towers))
+            tower.fireUpon(enemyPositions);
+    };
     this.draw = function() {
         Object.values(this.towers).forEach(tower => tower.draw());
     };
@@ -99,7 +103,16 @@ function TowerObj(sprite, point, type, variations, rangeShape, partSprite) {
         this.point = point;
         this.emitter.location = point;
     };
-    this.setTarget = function(point) {
+    this.fireUpon = function(enemyPositions) {
+        for (const enemyPos of enemyPositions()) {
+            if (this.point.distFrom(enemyPos) <= this.range) {
+                console.log(enemyPos);
+                this.fireAt(enemyPos);
+                break;
+            }
+        }
+    }
+    this.fireAt = function(point) {
         this.target = point;
         this.setBarrelAngle(this.toDegree(
             Math.atan2(this.point.y - point.y, this.point.x - point.x)));

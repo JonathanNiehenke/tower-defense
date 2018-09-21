@@ -28,6 +28,10 @@ function EnemeiesObj(healthBarShape) {
         if (this.enemies.length == 0) return true;
         return this.enemies[0].traveled > this.currentWave.spacing;
     }
+    this.positions = function*() {
+        for (enemy of this.enemies)
+            yield enemy.point;
+    };
     this.draw = function() {
         for (creep of this.enemies)
             creep.drawHealth(this.currentWave.health);
