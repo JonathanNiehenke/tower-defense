@@ -19,15 +19,16 @@ function EnemeiesObj(healthBarShape) {
     };
     this.createCreep = function() {
         if (this.isSpaced()) {
-            this.enemies.unshift(new CreepObj(
+            this.enemies.push(new CreepObj(
                 this.healthBarShape, this.currentWave));
             --this.currentWave.amount;
         }
     };
     this.isSpaced = function() {
         if (this.enemies.length == 0) return true;
-        return this.enemies[0].traveled > this.currentWave.spacing;
-    }
+        const lastIdx = this.enemies.length - 1;
+        return this.enemies[lastIdx].traveled > this.currentWave.spacing;
+    };
     this.positions = function*() {
         for (enemy of this.enemies)
             yield enemy.point;
