@@ -1,53 +1,39 @@
-function Emitter(point,direction,lifespan,numberofparticles,partSprite) {
-    this.particleCount = numberofparticles;
-    this.particles = new Array(); 
-    this.location = point; //PointObj for drawPos
-    this.direction = direction; //PointObj for initial direction
-    this.lifespan = lifespan;
-    this.mySound = new Sound("Sound/NFF-laser-gun-03.wav");
-    
-    this.renew = function(direction,location,lifespan) {
-        this.location = location;
-        this.direction = direction;
-        this.lifespan = lifespan;
-    };
+function Emitter(point, sprite, {range, pAmount, speed}) {
+    this.point = point;
+    this.sprite = sprite;
+    this.lifespan = range;
+    this.speed = speed;
+    this.particles = [];
     this.update = function(direction) {
-        for(var i=0;i<this.particleCount;i++) {
-            this.particles[i].update();
-        }
+        for(let particle of this.particles)
+            particle.update();
     };
-    this.draw = function() {  
-        for(var i=0;i<this.particleCount;i++) {
-            if(!this.particles[i].isDead())
-                this.particles[i].draw();
-        } 
+    this.draw = function() {
+        for(let particle of this.particles)
+            particle.draw();
     };
-    this.addparticle = function() {
-        for (var i = 0; i < this.particleCount; i++) {
-            if (this.particles[i].isDead()) {
-                this.mySound.play();
-                this.particles[i].renew(this.direction,new PointObj(this.location.x,this.location.y),this.lifespan);             
+    this.addparticle = function(direction) {
+        for (let particle of this.particles) {
+            if (!particle.isAlive()) {
+                let point = new PointObj(this.point.x, this.point.y);
+                particle.renew(point, direction, this.lifespan);
                 break;
             }
         }
     };
-    this.isDead = function() {
-        if(this.lifespan<0.0)
-            return true;
-        else
-            return false;
-    };
     this.getLiveParticles = function*() {
-        for (var i = 0; i < this.particles.length; i++) {
-            if (!this.particles[i].isDead()) {
-                yield this.particles[i];
-            }
+        for (let particle of this.particles) {
+            if (particle.isAlive())
+                yield particle;
         }
     };
     this.poolMemory = function() {
-        for(var i=0;i<this.particleCount;i++)
-            this.particles[i] = new Particle(new PointObj(this.location.x,this.location.y),this.direction,-1,partSprite);
+        for(var i=0; i < pAmount; i++) {
+            let point = new PointObj(this.point.x, this.point.y);
+            this.particles[i] = new Particle(sprite, point, this.speed);
+        }
     };
     this.poolMemory(); 
+    return this;
 };
 

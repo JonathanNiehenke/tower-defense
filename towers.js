@@ -73,8 +73,7 @@ function TowerObj(sprite, point, type, variations, rangeShape, partSprite) {
     this.variations = variations;
     this.level = 0;
     this.attributes = this.variations[this.level];
-    this.emitter = new Emitter(point, new PointObj(0, 0), 80,
-        this.attributes.pAmount, partSprite);
+    this.emitter = new Emitter(point, partSprite, this.attributes);
     this.centerFeet = new PointObj(this.sprite.width / 2, this.sprite.height);
     this.currentReload = this.attributes.reload;
     this.col = 6;
@@ -106,15 +105,13 @@ function TowerObj(sprite, point, type, variations, rangeShape, partSprite) {
     this.fireAt = function(point) {
         this.setBarrelAngle(this.toDegree(
             Math.atan2(this.point.y - point.y, this.point.x - point.x)));
-        this.sendProjectile(point);
+        if (this.currentReload <= 0)
+            this.sendProjectile(point);
     };
     this.sendProjectile = function(point) {
         let direction = point.sub(this.point.x, this.point.y).normalize();
-        this.emitter.direction = direction.multi(this.attributes.speed);
-        if (this.currentReload <= 0) {
-            this.emitter.addparticle();
-            this.currentReload = this.attributes.reload;
-        }
+        this.emitter.addparticle(direction);
+        this.currentReload = this.attributes.reload;
     };
     this.toDegree = function(radian) {
         let degree = radian * 180 / Math.PI;
