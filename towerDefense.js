@@ -12,14 +12,13 @@ function GameObj(canvas) {
         "towers": new SpriteObj(this.context, "sprites/Towers.png", 27, 8),
         "roads": new SpriteObj(this.context,  "sprites/IsoRoadSet_Kenney.png", 2, 4),
         "slime": new SpriteObj(this.context, "sprites/SlimeIso.png", 4, 4),
-        "balls": new SpriteObj(this.context, "sprites/Energy Ball.png", 8, 12),
     };
     this.map = new MapObj(
         new TileSetObj(this.sprites["roads"]),
         new IsoTangle(this.context));
     this.enemies = new EnemeiesObj(new HealthBar(this.context));
     this.defense = new DefenseNetworkObj(
-        this.sprites.towers, this.sprites.balls, new IsoCircle(this.context));
+        this.sprites.towers, new Orb(this.context), new IsoCircle(this.context));
     // 62.5 - 25, avg44
     this.init = function() {
         this.map.applyLevel({
@@ -48,6 +47,9 @@ function GameObj(canvas) {
         let point = this.map.centerOfTileAt(
             this.map.toIso(new PointObj(2, 2)));
         this.defense.place(6, point);
+        point = this.map.centerOfTileAt(
+            this.map.toIso(new PointObj(6, 0)));
+        this.defense.place(1, point);
         this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
         this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
         this.canvas.addEventListener("mouseup", this.mouseUp.bind(this));

@@ -77,3 +77,24 @@ function HealthBar(context) {
     return this;
 }
 
+function Orb(context) {
+    this.context = context;
+    this.draw = function(x, y, radius, blur, outerColor, innerColor) {
+        this.path(x, y, radius);
+        context.fillStyle = this.fill(x, y, radius, innerColor, outerColor);
+        context.fill();
+    };
+    this.path = function(x, y, radius) {
+        this.context.beginPath();
+        this.context.arc(x, y, radius, 0, 2 * Math.PI);
+    };
+    this.fill = function(x, y, radius, innerColor, outerColor) {
+        let gradient = context.createRadialGradient(
+            x, y, radius/2, x, y, radius);
+        gradient.addColorStop(0, innerColor);
+        gradient.addColorStop(1, outerColor);
+        return gradient;
+    };
+    return this;
+}
+

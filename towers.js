@@ -1,8 +1,7 @@
-function DefenseNetworkObj(sprite, ballSprite, rangeShape) {
+function DefenseNetworkObj(sprite, ballShape, rangeShape) {
+    console.log(ballShape);
     this.sprite = sprite;
-    this.ballSprite = ballSprite;
     this.towers = {};
-    this.rangeShape = rangeShape;
     this.towerVariations = [
         // cannon
         {"damage": 8, "range": 42, "pAmount": 1, "pSize": 25, "reload": 75, "speed": 6},
@@ -61,19 +60,19 @@ function DefenseNetworkObj(sprite, ballSprite, rangeShape) {
         const type = towerType * 3;
         let towerVariation = this.towerVariations.slice(type, type + 3);
         this.towers[point.toString()] = new TowerObj(sprite, point, type,
-            towerVariation, this.rangeShape, ballSprite);
+            towerVariation, ballShape, rangeShape);
     };
     return this;
 }
 
-function TowerObj(sprite, point, type, variations, rangeShape, partSprite) {
+function TowerObj(sprite, point, type, variations, ballShape, rangeShape) {
     this.sprite = sprite;
     this.point = point;
     this.type = type;
     this.variations = variations;
     this.level = 0;
     this.attributes = this.variations[this.level];
-    this.emitter = new Emitter(point, partSprite, this.attributes);
+    this.emitter = new Emitter(point, ballShape, this.attributes);
     this.centerFeet = new PointObj(this.sprite.width / 2, this.sprite.height);
     this.currentReload = this.attributes.reload;
     this.col = 6;

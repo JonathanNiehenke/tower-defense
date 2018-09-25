@@ -1,8 +1,8 @@
-function Emitter(point, sprite, {range, pAmount, speed}) {
+function Emitter(point, shape, {range, pAmount, speed, pSize}) {
     this.point = point;
-    this.sprite = sprite;
     this.range = range;
     this.speed = speed;
+    this.radius = pSize/2;
     this.living = [], this.dead = [];
     this.update = function(direction) {
         let temp = [];
@@ -33,7 +33,7 @@ function Emitter(point, sprite, {range, pAmount, speed}) {
     this.poolMemory = function() {
         for(var i=0; i < pAmount; i++) {
             let point = new PointObj(this.point.x, this.point.y, "Isometric");
-            this.dead[i] = new Particle(sprite, point, this.speed);
+            this.dead[i] = new Particle(shape, point, this.speed, this.radius);
         }
     };
     this.poolMemory(); 
