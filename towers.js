@@ -90,6 +90,7 @@ function TowerObj(sprite, point, type, variations, ballShape, rangeShape) {
     this.upgrade = function() {
         this.level += this.level < 2 ? 1 : 0;
         this.attributes = this.variations[this.level];
+        this.emitter.upgrade(this.attributes);
     };
     this.fireUpon = function(enemyPositions) {
         for (const enemyPos of enemyPositions()) {

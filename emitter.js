@@ -4,6 +4,11 @@ function Emitter(point, shape, {range, pAmount, speed, pSize}) {
     this.speed = speed;
     this.radius = pSize/2;
     this.living = [], this.dead = [];
+    this.upgrade = function({range, speed, pSize}) {
+        this.range = range;
+        this.speed = speed;
+        this.radius = pSize/2;
+    };
     this.update = function(direction) {
         let temp = [];
         while (this.living.length) {
@@ -15,7 +20,7 @@ function Emitter(point, shape, {range, pAmount, speed, pSize}) {
     };
     this.outOfRange = function(particle) {
         return particle.distFrom(this.point) > this.range;
-    }
+    };
     this.draw = function() {
         for(let particle of this.living)
             particle.draw();
@@ -23,7 +28,7 @@ function Emitter(point, shape, {range, pAmount, speed, pSize}) {
     this.addparticle = function(direction) {
         let particle = this.dead.shift()
         let point = new PointObj(this.point.x, this.point.y);
-        particle.renew(point, direction);
+        particle.renew(point, direction, this.speed, this.radius);
         this.living.push(particle);
     };
     this.getLiveParticles = function*() {
