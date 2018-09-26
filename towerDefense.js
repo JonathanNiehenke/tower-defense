@@ -57,7 +57,7 @@ function GameObj(canvas) {
     };
     this.loop = function() {
         try { this.update(); }
-        catch { this.end(); }
+        catch (_) { this.end(); }
         this.draw();
     };
     this.update = function() {

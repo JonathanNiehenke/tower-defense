@@ -61,7 +61,7 @@ function MapStructureObj() {
     };
     this.value = function(point) {
         try { return this.structure[point.y][point.x]; }
-        catch { return undefined; }
+        catch (_) { return undefined; }
     };
     this.return;
 }
