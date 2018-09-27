@@ -1,25 +1,27 @@
 function DefenseNetworkObj(sprite, ballShape, rangeShape) {
     this.sprite = sprite;
-    this.towers = {};
+    this.towers = [];
     this.fireUpon = function(enemyPositions) {
-        for (let tower of Object.values(this.towers))
-            tower.fireUpon(enemyPositions);
+        this.towers.forEach(tower => tower.fireUpon(enemyPositions));
     };
     this.draw = function() {
-        Object.values(this.towers).forEach(tower => tower.draw());
+        this.towers.forEach(tower => tower.draw());
     };
     this.upgradeAt = function(point) {
-        try { this.towers[point.toString()].upgrade(); }
+        try { this.towerAt(point).upgrade(); }
         catch (e) { if (!(e instanceof TypeError)) throw e; }
     };
     this.highlightRangeAt = function(point) {
-        try { this.towers[point.toString()].highlightRange(); }
+        try { this.towerAt(point).highlightRange(); }
         catch (e) { if (!(e instanceof TypeError)) throw e; }
     };
     this.place = function(type, point) {
-        if (this.towers[point.toString()] !== undefined) return;
-        this.towers[point.toString()] = new TowerObj(
-            sprite, point, type, ballShape, rangeShape);
+        if (this.towerAt(point)) return;
+        this.towers.push(new TowerObj(
+            sprite, point, type, ballShape, rangeShape));
+    };
+    this.towerAt = function(point) {
+        return this.towers.find(tower => tower.isAt(point));
     };
     return this;
 }
@@ -118,6 +120,9 @@ function TowerObj(sprite, point, type, ballShape, rangeShape) {
     this.setBarrelAngle = function(degree) {
         const span = 360 / 8, toCenter = span / 2;
         this.col = Math.floor((degree + toCenter) % 360 / span);
+    };
+    this.isAt = function(point) {
+        return this.point.equals(point.x, point.y);
     };
 }
 
