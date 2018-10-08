@@ -1,8 +1,7 @@
-function Particle(shape, point) {
-    this.point = point;
+function Particle(shape) {
+    this.point = this.direction = undefined;
     this.radius = this.speed = 0;
-    this.direction = new PointObj(0, 0);
-    this.renew = function(point, direction, speed, radius) {
+    this.apply = function(point, direction, speed, radius) {
         this.point = point;
         this.direction = direction;
         this.speed = speed;

@@ -26,22 +26,16 @@ function Emitter(point, shape, {range, pAmount, speed, pSize}) {
             particle.draw();
     };
     this.addparticle = function(direction) {
-        let particle = this.dead.shift()
+        let particle = (
+            this.dead.length ? this.dead.shift() : new Particle(shape));
         let point = new PointObj(this.point.x, this.point.y);
-        particle.renew(point, direction, this.speed, this.radius);
+        particle.apply(point, direction, this.speed, this.radius);
         this.living.push(particle);
     };
     this.getLiveParticles = function*() {
         for (let particle of this.living)
             yield particle;
     };
-    this.poolMemory = function() {
-        for(var i=0; i < pAmount; i++) {
-            let point = new PointObj(this.point.x, this.point.y, "Isometric");
-            this.dead[i] = new Particle(shape, point, this.speed, this.radius);
-        }
-    };
-    this.poolMemory(); 
     return this;
 };
 
