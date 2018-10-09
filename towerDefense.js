@@ -57,12 +57,18 @@ function GameObj(canvas) {
     };
     this.loop = function() {
         try { this.update(); }
-        catch (_) { this.end(); }
+        catch (e) { this.handleError(e); }
         this.draw();
     };
     this.update = function() {
         this.enemies.update(this.map.heading.bind(this.map), this.map.directions);
         this.defense.update(this.enemies.positions.bind(this.enemies));
+    };
+    this.handleError = function(e) {
+        if (e === "End of waves")
+            this.end();
+        else
+            throw e;
     };
     this.draw = function() {
         this.context.save();
