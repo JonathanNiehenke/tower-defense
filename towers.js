@@ -1,11 +1,13 @@
-function DefenseNetworkObj(sprite, ballShape, rangeShape) {
-    this.sprite = sprite;
+function DefenseNetworkObj(sprite, particleShape, rangeShape) {
+    this.emitter = new Emitter(particleShape);
     this.towers = [];
-    this.fireUpon = function(enemyPositions) {
+    this.update = function(enemyPositions) {
+        this.emitter.update();
         this.towers.forEach(tower => tower.fireUpon(enemyPositions));
     };
     this.draw = function() {
         this.towers.forEach(tower => tower.draw());
+        this.emitter.draw();
     };
     this.upgradeAt = function(point) {
         try { this.towerAt(point).upgrade(); }
@@ -18,7 +20,8 @@ function DefenseNetworkObj(sprite, ballShape, rangeShape) {
     this.place = function(type, point) {
         if (this.towerAt(point)) return;
         this.towers.push(new TowerObj(
-            sprite, point, type, ballShape, rangeShape));
+            sprite, point, type, rangeShape,
+	        this.emitter.addParticle.bind(this.emitter)));
     };
     this.towerAt = function(point) {
         return this.towers.find(tower => tower.isAt(point));
@@ -65,14 +68,13 @@ let towerTypes = [
         {"damage": 4, "range": 100, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8}, ],
 ];
 
-function TowerObj(sprite, point, type, ballShape, rangeShape) {
+function TowerObj(sprite, point, type, rangeShape, addParticle) {
     this.sprite = sprite;
     this.point = point;
     this.type = type * 3;
     this.variations = towerTypes[type];
     this.level = 0;
     this.attributes = this.variations[this.level];
-    this.emitter = new Emitter(point, ballShape, this.attributes);
     this.centerFeet = new PointObj(this.sprite.width / 2, this.sprite.height);
     this.currentReload = this.attributes.reload;
     this.col = 6;
@@ -80,7 +82,6 @@ function TowerObj(sprite, point, type, ballShape, rangeShape) {
         let drawPos = this.point.sub(this.centerFeet.x, this.centerFeet.y);
         this.sprite.draw(
             this.col, this.type + this.level, drawPos.x, drawPos.y);
-        this.emitter.draw();
     };
     this.highlightRange = function() {
         rangeShape.draw(
@@ -90,7 +91,6 @@ function TowerObj(sprite, point, type, ballShape, rangeShape) {
     this.upgrade = function() {
         this.level += this.level < 2 ? 1 : 0;
         this.attributes = this.variations[this.level];
-        this.emitter.upgrade(this.attributes);
     };
     this.fireUpon = function(enemyPositions) {
         for (const enemyPos of enemyPositions()) {
@@ -100,7 +100,6 @@ function TowerObj(sprite, point, type, ballShape, rangeShape) {
             }
         }
         --this.currentReload;
-        this.emitter.update()
     }
     this.fireAt = function(point) {
         this.setBarrelAngle(this.toDegree(
@@ -110,7 +109,7 @@ function TowerObj(sprite, point, type, ballShape, rangeShape) {
     };
     this.sendProjectile = function(point) {
         let direction = point.sub(this.point.x, this.point.y).normalize();
-        this.emitter.addparticle(direction);
+        addParticle(this.point, direction, this.attributes);
         this.currentReload = this.attributes.reload;
     };
     this.toDegree = function(radian) {

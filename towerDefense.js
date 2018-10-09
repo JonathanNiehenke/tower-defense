@@ -62,7 +62,7 @@ function GameObj(canvas) {
     };
     this.update = function() {
         this.enemies.update(this.map.heading.bind(this.map), this.map.directions);
-        this.defense.fireUpon(this.enemies.positions.bind(this.enemies));
+        this.defense.update(this.enemies.positions.bind(this.enemies));
     };
     this.draw = function() {
         this.context.save();
