@@ -12,14 +12,14 @@ function Particle(shape) {
         this.point.iAdd(this.direction.multi(this.attributes.speed));
     };
     this.draw = function() {
-        shape.draw(this.point.x, this.point.y, this.attributes.pSize / 2,
+        shape.draw(this.point.x, this.point.y, this.attributes.pSize,
             undefined, "red", "white");
     };
     this.outOfRange = function() {
         return this.origin.distFrom(this.point) > this.attributes.range;
     };
     this.withinRange = function(point) {
-        return this.point.distFrom(point) <= this.attributes.pSize;
+        return this.point.distFrom(point, false) <= this.attributes.pSize;
     };
     this.damage = function() {
         return this.attributes.damage;

@@ -36,13 +36,13 @@ function GameObj(canvas) {
         let slime = this.sprites["slime"];
         this.enemies.newWaves([
             {"sprite": slime, "amount": 6, "start": this.map.start,
-             "heading": "E", "spacing": 35, "speed": 1, "health": 100},
+             "heading": "E", "spacing": 70, "speed": 1, "health": 20},
             {"sprite": slime, "amount": 6, "start": this.map.start,
-             "heading": "E", "spacing": 20, "speed": 2, "health": 100},
+             "heading": "E", "spacing": 60, "speed": 2, "health": 20},
             {"sprite": slime, "amount": 6, "start": this.map.start,
-             "heading": "E", "spacing": 10, "speed": 1, "health": 100},
+             "heading": "E", "spacing": 30, "speed": 1, "health": 20},
             {"sprite": slime, "amount": 24, "start": this.map.start,
-             "heading": "E", "spacing": 10, "speed": 0.5, "health": 100},
+             "heading": "E", "spacing": 30, "speed": 0.5, "health": 20},
         ]);
         let point = this.map.centerOfTileAt(
             this.map.toIso(new PointObj(2, 2)));

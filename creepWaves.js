@@ -61,7 +61,7 @@ function CreepObj(healthBarShape, {sprite, start, heading, speed, health}) {
     this.changeFacing = { "N": 0, "S": 1, "E": 2, "W": 3 };
     this.facing = this.changeFacing[this.heading];
     this.update = function(headingFunc, directions) {
-        if (this.traveled % 20 < this.speed)
+        if (this.traveled % 50 < this.speed)
             try { this.setHeading(headingFunc); }
             catch (e) {this.updateCatch(e)}
         this.move(directions);

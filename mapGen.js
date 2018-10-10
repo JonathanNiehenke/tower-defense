@@ -2,11 +2,12 @@ function MapObj(tiles, shape) {
     this.tiles = tiles;
     this.shape = shape;
     this.size = this.tiles.getWidth() / 2;
+    const steps = 50;
     this.directions = {
-        "N": (new PointObj(0, -this.size/20)).convert(),
-        "S": (new PointObj(0, this.size/20)).convert(),
-        "E": (new PointObj(this.size/20, 0)).convert(),
-        "W": (new PointObj(-this.size/20, 0)).convert(),
+        "N": (new PointObj(0, -this.size / steps)).convert(),
+        "S": (new PointObj(0, this.size / steps)).convert(),
+        "E": (new PointObj(this.size / steps, 0)).convert(),
+        "W": (new PointObj(-this.size / steps, 0)).convert(),
     };
     this.structure = new MapStructureObj();
     this.applyLevel = function(level) {
