@@ -5,11 +5,9 @@ function EnemeiesObj(healthBarShape) {
         this.waveInfo = waveInfo;
         this.currentWave = this.waveInfo.shift();
     };
-    this.update = function(headingFunc, directions) {
+    this.move = function(headingFunc, directions) {
         for (let creep of this.enemies)
             creep.update(headingFunc, directions);
-        try { this.updateWave(); }
-        catch (_) { throw "End of waves"; }
     };
     this.updateWave = function() {
         this.enemies = this.enemies.filter(creep => creep.health > 0);

@@ -56,19 +56,16 @@ function GameObj(canvas) {
         this.animation = setInterval(this.loop.bind(this), 28);
     };
     this.loop = function() {
-        try { this.update(); }
-        catch (e) { this.handleError(e); }
+        this.update();
         this.draw();
     };
     this.update = function() {
-        this.enemies.update(this.map.heading.bind(this.map), this.map.directions);
-        this.defense.update(this.enemies.positions.bind(this.enemies), this.enemies.hit.bind(this.enemies));
-    };
-    this.handleError = function(e) {
-        if (e === "End of waves")
-            this.end();
-        else
-            throw e;
+        this.enemies.move(this.map.heading.bind(this.map), this.map.directions);
+        this.defense.update(
+            this.enemies.positions.bind(this.enemies),
+            this.enemies.hit.bind(this.enemies));
+        try { this.enemies.updateWave(); }
+        catch (_) { this.end(); }
     };
     this.draw = function() {
         this.context.save();
