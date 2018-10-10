@@ -1,13 +1,17 @@
 function Emitter(shape) {
     this.living = [], this.dead = [];
-    this.update = function() {
-        let temp = [];
-        while (this.living.length) {
-            let particle = this.living.shift();
+    this.update = function(hitEnemies) {
+        for (let particle of this.living)
             particle.update();
-            (particle.outOfRange() ? this.dead : temp).push(particle);
+        this.killIf(particle => particle.outOfRange());
+    };
+    this.killIf = function(condition) {
+        for (let i = 0; i < this.living.length; ++i) {
+            if (condition(this.living[i])) {
+                this.dead.push(this.living[i]);
+                this.living.splice(i--, 1);
+            }
         }
-        this.living = temp;
     };
     this.draw = function() {
         for(let particle of this.living)
