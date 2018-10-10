@@ -4,6 +4,8 @@ function Emitter(shape) {
         for (let particle of this.living)
             particle.update();
         this.killIf(particle => particle.outOfRange());
+        this.killIf(particle => hitEnemies(
+            point => particle.withinRange(point), particle.damage()));
     };
     this.killIf = function(condition) {
         for (let i = 0; i < this.living.length; ++i) {
@@ -22,10 +24,6 @@ function Emitter(shape) {
             this.dead.length ? this.dead.shift() : new Particle(shape));
         particle.apply(point, direction, attributes);
         this.living.push(particle);
-    };
-    this.getLiveParticles = function*() {
-        for (let particle of this.living)
-            yield particle;
     };
     return this;
 };

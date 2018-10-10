@@ -2,7 +2,6 @@ function Particle(shape) {
     this.origin = new PointObj(0, 0, "Isometric");
     this.point = new PointObj(0, 0, "Isometric");
     this.direction = new PointObj(0, 0);
-    this.radius = this.speed = 0;
     this.apply = function(point, direction, attributes) {
         this.origin.change(point.x, point.y);
         this.point.change(point.x, point.y);
@@ -18,5 +17,11 @@ function Particle(shape) {
     };
     this.outOfRange = function() {
         return this.origin.distFrom(this.point) > this.attributes.range;
+    };
+    this.withinRange = function(point) {
+        return this.point.distFrom(point) <= this.attributes.pSize;
+    };
+    this.damage = function() {
+        return this.attributes.damage;
     };
 };

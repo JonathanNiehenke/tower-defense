@@ -40,6 +40,12 @@ function EnemeiesObj(healthBarShape) {
         for (creep of this.enemies)
             creep.draw();
     };
+    this.hit = function(condition, damageAmount) {
+        let creep = this.enemies.find(creep => condition(creep.point));
+        try { creep.damage(damageAmount); }
+        catch (_) { return false; }
+        return true;
+    };
     this.return;
 }
 
@@ -87,6 +93,9 @@ function CreepObj(healthBarShape, {sprite, start, heading, speed, health}) {
         const drawPos = this.point.add(
             this.centerFeet.x, this.centerFeet.y).floor();
         this.sprite.draw(this.col, this.facing, drawPos.x, drawPos.y);
+    };
+    this.damage = function(amount) {
+        this.health -= amount;
     };
 }
 

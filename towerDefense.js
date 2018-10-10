@@ -62,7 +62,7 @@ function GameObj(canvas) {
     };
     this.update = function() {
         this.enemies.update(this.map.heading.bind(this.map), this.map.directions);
-        this.defense.update(this.enemies.positions.bind(this.enemies));
+        this.defense.update(this.enemies.positions.bind(this.enemies), this.enemies.hit.bind(this.enemies));
     };
     this.handleError = function(e) {
         if (e === "End of waves")

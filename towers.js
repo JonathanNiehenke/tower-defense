@@ -1,8 +1,8 @@
 function DefenseNetworkObj(sprite, particleShape, rangeShape) {
     this.emitter = new Emitter(particleShape);
     this.towers = [];
-    this.update = function(enemyPositions) {
-        this.emitter.update();
+    this.update = function(enemyPositions, hitEnemies) {
+        this.emitter.update(hitEnemies);
         this.towers.forEach(tower => tower.fireUpon(enemyPositions));
     };
     this.draw = function() {
