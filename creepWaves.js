@@ -38,8 +38,8 @@ function EnemeiesObj(healthBarShape) {
         for (creep of this.enemies)
             creep.draw();
     };
-    this.hit = function(condition, damageAmount) {
-        let creep = this.enemies.find(creep => condition(creep.point));
+    this.hit = function(withinRange, damageAmount) {
+        let creep = this.enemies.find(creep => withinRange(creep.point, 5));
         try { creep.damage(damageAmount); }
         catch (_) { return false; }
         return true;

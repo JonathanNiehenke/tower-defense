@@ -18,8 +18,9 @@ function Particle(shape) {
     this.outOfRange = function() {
         return this.origin.distFrom(this.point) > this.attributes.range;
     };
-    this.withinRange = function(point) {
-        return this.point.distFrom(point, false) <= this.attributes.pSize;
+    this.withinRange = function(point, hitSize=0) {
+        const size = this.attributes.pSize + hitSize;
+        return this.point.distFrom(point, false) <= size;
     };
     this.damage = function() {
         return this.attributes.damage;

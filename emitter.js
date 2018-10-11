@@ -5,7 +5,7 @@ function Emitter(shape) {
             particle.update();
         this.killIf(particle => particle.outOfRange());
         this.killIf(particle => hitEnemies(
-            point => particle.withinRange(point), particle.damage()));
+            (point, size) => particle.withinRange(point, size), particle.damage()));
     };
     this.killIf = function(condition) {
         for (let i = 0; i < this.living.length; ++i) {
