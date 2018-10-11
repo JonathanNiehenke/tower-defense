@@ -1,4 +1,4 @@
-function EnemeiesObj(healthBarShape) {
+function EnemiesObj(healthBarShape) {
     this.healthBarShape = healthBarShape;
     this.waveInfo = this.enemies = [];
     this.newWaves = function(waveInfo) {

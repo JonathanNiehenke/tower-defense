@@ -16,7 +16,7 @@ function GameObj(canvas) {
     this.map = new MapObj(
         new TileSetObj(this.sprites["roads"]),
         new IsoTangle(this.context));
-    this.enemies = new EnemeiesObj(new HealthBar(this.context));
+    this.enemies = new EnemiesObj(new HealthBar(this.context));
     this.defense = new DefenseNetworkObj(
         this.sprites.towers, new Orb(this.context), new IsoCircle(this.context));
     // 62.5 - 25, avg44
