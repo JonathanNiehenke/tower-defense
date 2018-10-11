@@ -50,11 +50,11 @@ function EnemeiesObj(healthBarShape) {
 function CreepObj(healthBarShape, {sprite, start, heading, speed, health}) {
     this.healthBarShape = healthBarShape;
     this.sprite = sprite;
-    this.point = start;
+    this.point = start.add(0, -this.sprite.height / 4);
     this.heading = heading;
     this.speed = speed;
     this.health = health;
-    this.centerFeet = new PointObj(-this.sprite.width / 2, -this.sprite.height);
+    this.center = new PointObj(-this.sprite.width / 2, -this.sprite.height / 2);
     this.col = this.traveled = 0;
     this.changeFacing = { "N": 0, "S": 1, "E": 2, "W": 3 };
     this.facing = this.changeFacing[this.heading];
@@ -82,14 +82,12 @@ function CreepObj(healthBarShape, {sprite, start, heading, speed, health}) {
         this.point = this.point.add(trajectory.x, trajectory.y);
     };
     this.drawHealth = function(initHealth) {
-        const drawPos = this.point.floor(), spacing = 5, width = 5;
-        this.healthBarShape.draw(
-            drawPos.x - this.sprite.width / 2, drawPos.y + spacing,
-            this.sprite.width, width, "Black", this.health/initHealth);
+        const drawPos = this.point.add(this.center.x, this.center.y).floor();
+        this.healthBarShape.draw(drawPos.x, drawPos.y + this.sprite.height,
+            this.sprite.width, 5, "Black", this.health/initHealth);
     };
     this.draw = function() {
-        const drawPos = this.point.add(
-            this.centerFeet.x, this.centerFeet.y).floor();
+        const drawPos = this.point.add(this.center.x, this.center.y).floor();
         this.sprite.draw(this.col, this.facing, drawPos.x, drawPos.y);
     };
     this.damage = function(amount) {
