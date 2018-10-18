@@ -1,26 +1,25 @@
 function init() {
-    let game = new GameObj(
+    let game = new Game(
         document.getElementById("bg"), document.getElementById("fg"));
     game.init();
 }
 
-function GameObj(bgCanvas, fgCanvas) {
+function Game(bgCanvas, fgCanvas) {
     this.canvas = fgCanvas;
     this.bgContext = bgCanvas.getContext('2d');
     this.fgContext = fgCanvas.getContext('2d');
-    this.mousePos = new PointObj(-1, -1);
+    this.mousePos = new Point(-1, -1);
     this.animation = undefined;
     this.sprites = {
-        "towers": new SpriteObj(this.fgContext, "sprites/Towers.png", 27, 8),
-        "roads": new SpriteObj(this.bgContext,  "sprites/IsoRoadSet_Kenney.png", 2, 4),
-        "slime": new SpriteObj(this.fgContext, "sprites/SlimeIso.png", 4, 4),
+        "towers": new Sprite(this.fgContext, "sprites/Towers.png", 27, 8),
+        "roads": new Sprite(this.bgContext,  "sprites/IsoRoadSet_Kenney.png", 2, 4),
+        "slime": new Sprite(this.fgContext, "sprites/SlimeIso.png", 4, 4),
     };
-    this.map = new MapObj(
-        new TileSetObj(this.sprites["roads"]),
-        new IsoTangle(this.fgContext));
-    this.enemies = new EnemiesObj(new HealthBar(this.fgContext));
-    this.defense = new DefenseNetworkObj(this.sprites["towers"],
-        new Orb(this.fgContext),new IsoCircle(this.fgContext));
+    this.map = new Map(
+        new TileSet(this.sprites["roads"]), new IsoTangle(this.fgContext));
+    this.enemies = new Enemies(new HealthBar(this.fgContext));
+    this.defense = new DefenseNetwork(this.sprites["towers"],
+        new Orb(this.fgContext), new IsoCircle(this.fgContext));
     this.init = function() {
         this.map.applyLevel({
             "mapArray": [
@@ -32,7 +31,7 @@ function GameObj(bgCanvas, fgCanvas) {
                 [0, 0, 0, 2, 0, 0, 0],
                 [3, 3, 3, 5, 0, 0, 0]
             ],
-            "startTile": new PointObj(0, 6),
+            "startTile": new Point(0, 6),
         });
         let slime = this.sprites["slime"];
         this.enemies.newWaves([
@@ -46,10 +45,10 @@ function GameObj(bgCanvas, fgCanvas) {
              "heading": "E", "spacing": 30, "speed": 0.5, "health": 20},
         ]);
         let point = this.map.centerOfTileAt(
-            this.map.toIso(new PointObj(2, 2)));
+            this.map.toIso(new Point(2, 2)));
         this.defense.place(6, point);
         point = this.map.centerOfTileAt(
-            this.map.toIso(new PointObj(6, 0)));
+            this.map.toIso(new Point(6, 0)));
         this.defense.place(1, point);
         this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
         this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
@@ -96,7 +95,7 @@ function GameObj(bgCanvas, fgCanvas) {
     this.mouseUp = function() {
     };
     this.mouseToIso = function() {
-        return new PointObj(this.mousePos.x - this.canvas.width / 2,
+        return new Point(this.mousePos.x - this.canvas.width / 2,
             this.mousePos.y, "isometric");
     };
     this.end = function() {

@@ -1,4 +1,4 @@
-function EnemiesObj(healthBarShape) {
+function Enemies(healthBarShape) {
     this.healthBarShape = healthBarShape;
     this.waveInfo = this.enemies = [];
     this.newWaves = function(waveInfo) {
@@ -18,7 +18,7 @@ function EnemiesObj(healthBarShape) {
     };
     this.createCreep = function() {
         if (this.isSpaced()) {
-            this.enemies.push(new CreepObj(
+            this.enemies.push(new Creep(
                 this.healthBarShape, this.currentWave));
             --this.currentWave.amount;
         }
@@ -47,14 +47,14 @@ function EnemiesObj(healthBarShape) {
     this.return;
 }
 
-function CreepObj(healthBarShape, {sprite, start, heading, speed, health}) {
+function Creep(healthBarShape, {sprite, start, heading, speed, health}) {
     this.healthBarShape = healthBarShape;
     this.sprite = sprite;
     this.point = start.add(0, -this.sprite.height / 4);
     this.heading = heading;
     this.speed = speed;
     this.health = health;
-    this.center = new PointObj(-this.sprite.width / 2, -this.sprite.height / 2);
+    this.center = new Point(-this.sprite.width / 2, -this.sprite.height / 2);
     this.col = this.traveled = 0;
     this.changeFacing = { "N": 0, "S": 1, "E": 2, "W": 3 };
     this.facing = this.changeFacing[this.heading];

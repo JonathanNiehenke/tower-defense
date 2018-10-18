@@ -29,9 +29,9 @@ function Emitter(shape) {
 };
 
 function Particle(shape) {
-    this.origin = new PointObj(0, 0, "Isometric");
-    this.point = new PointObj(0, 0, "Isometric");
-    this.direction = new PointObj(0, 0);
+    this.origin = new Point(0, 0, "Isometric");
+    this.point = new Point(0, 0, "Isometric");
+    this.direction = new Point(0, 0);
     this.apply = function(point, direction, attributes) {
         this.origin.change(point.x, point.y);
         this.point.change(point.x, point.y);

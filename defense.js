@@ -1,4 +1,4 @@
-function DefenseNetworkObj(sprite, particleShape, rangeShape) {
+function DefenseNetwork(sprite, particleShape, rangeShape) {
     this.emitter = new Emitter(particleShape);
     this.towers = [];
     this.update = function(enemyPositions, hitEnemies) {
@@ -19,7 +19,7 @@ function DefenseNetworkObj(sprite, particleShape, rangeShape) {
     };
     this.place = function(type, point) {
         if (this.towerAt(point)) return;
-        this.towers.push(new TowerObj(
+        this.towers.push(new Tower(
             sprite, point, type, rangeShape,
 	        this.emitter.addParticle.bind(this.emitter)));
     };
@@ -68,14 +68,14 @@ let towerTypes = [
         {"damage": 4, "range": 100, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8}, ],
 ];
 
-function TowerObj(sprite, point, type, rangeShape, addParticle) {
+function Tower(sprite, point, type, rangeShape, addParticle) {
     this.sprite = sprite;
     this.point = point;
     this.type = type * 3;
     this.variations = towerTypes[type];
     this.level = 0;
     this.attributes = this.variations[this.level];
-    this.centerFeet = new PointObj(this.sprite.width / 2, this.sprite.height);
+    this.centerFeet = new Point(this.sprite.width / 2, this.sprite.height);
     this.currentReload = this.attributes.reload;
     this.col = 6;
     this.draw = function() {

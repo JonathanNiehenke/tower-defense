@@ -1,15 +1,15 @@
-function MapObj(tiles, shape) {
+function Map(tiles, shape) {
     this.tiles = tiles;
     this.shape = shape;
     this.size = this.tiles.getWidth() / 2;
     const steps = 50;
     this.directions = {
-        "N": (new PointObj(0, -this.size / steps)).convert(),
-        "S": (new PointObj(0, this.size / steps)).convert(),
-        "E": (new PointObj(this.size / steps, 0)).convert(),
-        "W": (new PointObj(-this.size / steps, 0)).convert(),
+        "N": (new Point(0, -this.size / steps)).convert(),
+        "S": (new Point(0, this.size / steps)).convert(),
+        "E": (new Point(this.size / steps, 0)).convert(),
+        "W": (new Point(-this.size / steps, 0)).convert(),
     };
-    this.structure = new MapStructureObj();
+    this.structure = new MapStructure();
     this.applyLevel = function(level) {
         this.structure.new(level.mapArray);
         this.start = this.centerOfTileAt(this.toIso(level.startTile));
@@ -50,7 +50,7 @@ function MapObj(tiles, shape) {
     return this;
 }
 
-function MapStructureObj() {
+function MapStructure() {
     this.structure = [];
     this.new = function(structure) {
         this.structure = structure;
@@ -58,7 +58,7 @@ function MapStructureObj() {
     this.iter = function*() {
         for (const [y, row] of this.structure.entries())
             for (const [x, val] of row.entries())
-                yield [new PointObj(x, y), val];
+                yield [new Point(x, y), val];
     };
     this.value = function(point) {
         try { return this.structure[point.y][point.x]; }
@@ -67,7 +67,7 @@ function MapStructureObj() {
     this.return;
 }
 
-function TileSetObj(sprite) {
+function TileSet(sprite) {
     this.sprite = sprite;
     this.tileMovement = [
         undefined,

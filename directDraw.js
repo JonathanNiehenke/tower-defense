@@ -1,4 +1,4 @@
-function SpriteObj(context, imgSheet, imgRows, imgCols) {
+function Sprite(context, imgSheet, imgRows, imgCols) {
     this.context = context;
     this.img = loadImage(imgSheet);
     this.width = this.img.width / imgCols;

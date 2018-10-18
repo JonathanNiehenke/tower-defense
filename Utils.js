@@ -5,15 +5,15 @@ function loadImage(Name) {
 }
 
 // Object that holds a point and converts between Cartesian and Isometric
-function PointObj(x, y, type="Cartesian") {
+function Point(x, y, type="Cartesian") {
     this.x = x;
     this.y = y;
     this.type = type;
     this.toCartesian = function() {
-        return new PointObj((2*this.y + this.x) / 2, (2*this.y - this.x) / 2);
+        return new Point((2*this.y + this.x) / 2, (2*this.y - this.x) / 2);
     };
     this.toIsometric = function() {
-        return new PointObj(this.x - this.y, (this.x + this.y) / 2, "Isometric");
+        return new Point(this.x - this.y, (this.x + this.y) / 2, "Isometric");
     };
     this.convert = function() {
         return this.type == "Cartesian" ? this.toIsometric() : this.toCartesian();
@@ -23,7 +23,7 @@ function PointObj(x, y, type="Cartesian") {
     };
     this.add = function(z, y=undefined) {
         y = (y === undefined ? z : y);
-        return new PointObj(this.x + z, this.y + y, this.type);
+        return new Point(this.x + z, this.y + y, this.type);
     };
     this.iAdd = function(point) {
         this.x += point.x;
@@ -31,23 +31,23 @@ function PointObj(x, y, type="Cartesian") {
     },
     this.sub = function(z, y=undefined) {
         y = (y === undefined ? z : y);
-        return new PointObj(this.x - z, this.y - y, this.type);
+        return new Point(this.x - z, this.y - y, this.type);
     };
     this.aSub = function(z, y=undefined) {
         y = (y === undefined ? z : y);
-        return new PointObj(Math.abs(this.x - z), Math.abs(this.y - y), this.type);
+        return new Point(Math.abs(this.x - z), Math.abs(this.y - y), this.type);
     };
     this.multi = function(z, y=undefined) {
         y = (y === undefined ? z : y);
-        return new PointObj(this.x * z, this.y * y, this.type);
+        return new Point(this.x * z, this.y * y, this.type);
     };
     this.div = function(z, y=undefined) {
         y = (y === undefined ? z : y);
-        return new PointObj(this.x / z, this.y / y, this.type);
+        return new Point(this.x / z, this.y / y, this.type);
     };
     this.fdiv = function(z, y=undefined) {
         y = (y === undefined ? z : y);
-        return new PointObj(
+        return new Point(
             Math.floor( this.x / z), Math.floor(this.y / y), this.type);
     };
     this.iDiv = function(int) {
@@ -55,7 +55,7 @@ function PointObj(x, y, type="Cartesian") {
         this.y=this.y / int;
     };
     this.floor = function() {
-        return new PointObj(Math.floor(this.x), Math.floor(this.y), this.type);
+        return new Point(Math.floor(this.x), Math.floor(this.y), this.type);
     };
     this.distFrom = function(point, applyIsometric=true) {
         let difference = this.aSub(point.x, point.y);
