@@ -1,25 +1,26 @@
 function init() {
-    let game = new GameObj(document.querySelector("CANVAS"));
+    let game = new GameObj(
+        document.getElementById("bg"), document.getElementById("fg"));
     game.init();
 }
 
-function GameObj(canvas) {
-    this.canvas = canvas;
-    this.context = canvas.getContext('2d');
+function GameObj(bgCanvas, fgCanvas) {
+    this.canvas = fgCanvas;
+    this.bgContext = bgCanvas.getContext('2d');
+    this.fgContext = fgCanvas.getContext('2d');
     this.mousePos = new PointObj(-1, -1);
     this.animation = undefined;
     this.sprites = {
-        "towers": new SpriteObj(this.context, "sprites/Towers.png", 27, 8),
-        "roads": new SpriteObj(this.context,  "sprites/IsoRoadSet_Kenney.png", 2, 4),
-        "slime": new SpriteObj(this.context, "sprites/SlimeIso.png", 4, 4),
+        "towers": new SpriteObj(this.fgContext, "sprites/Towers.png", 27, 8),
+        "roads": new SpriteObj(this.bgContext,  "sprites/IsoRoadSet_Kenney.png", 2, 4),
+        "slime": new SpriteObj(this.fgContext, "sprites/SlimeIso.png", 4, 4),
     };
     this.map = new MapObj(
         new TileSetObj(this.sprites["roads"]),
-        new IsoTangle(this.context));
-    this.enemies = new EnemiesObj(new HealthBar(this.context));
-    this.defense = new DefenseNetworkObj(
-        this.sprites.towers, new Orb(this.context), new IsoCircle(this.context));
-    // 62.5 - 25, avg44
+        new IsoTangle(this.fgContext));
+    this.enemies = new EnemiesObj(new HealthBar(this.fgContext));
+    this.defense = new DefenseNetworkObj(this.sprites["towers"],
+        new Orb(this.fgContext),new IsoCircle(this.fgContext));
     this.init = function() {
         this.map.applyLevel({
             "mapArray": [
@@ -53,11 +54,12 @@ function GameObj(canvas) {
         this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
         this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
         this.canvas.addEventListener("mouseup", this.mouseUp.bind(this));
+        this.drawFromMiddle(this.bgContext, this.map.draw.bind(this.map));
         this.animation = setInterval(this.loop.bind(this), 28);
     };
     this.loop = function() {
         this.update();
-        this.draw();
+        this.drawFromMiddle(this.fgContext, this.drawForeground.bind(this));
     };
     this.update = function() {
         this.enemies.move(this.map.heading.bind(this.map), this.map.directions);
@@ -67,11 +69,14 @@ function GameObj(canvas) {
         try { this.enemies.updateWave(); }
         catch (_) { this.end(); }
     };
-    this.draw = function() {
-        this.context.save();
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.context.translate(this.canvas.width / 2, 0);
-        this.map.draw();
+    this.drawFromMiddle = function(context, drawFunc) {
+        context.save();
+        context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        context.translate(this.canvas.width / 2, 0);
+        drawFunc();
+        context.restore();
+    };
+    this.drawForeground = function() {
         if (this.map.isMap(this.mouseToIso())) {
             this.map.highlightTileAt(this.mouseToIso());
             this.defense.highlightRangeAt(
@@ -79,10 +84,9 @@ function GameObj(canvas) {
         }
         this.enemies.draw();
         this.defense.draw();
-        this.context.restore();
     };
     this.mouseMove = function(e) {
-        let rect = canvas.getBoundingClientRect();
+        let rect = this.canvas.getBoundingClientRect();
         this.mousePos.change(e.clientX - rect.x, e.clientY - rect.y);
     };
     this.mouseDown = function() {
