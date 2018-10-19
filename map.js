@@ -2,12 +2,12 @@ function Map(tiles, shape) {
     this.tiles = tiles;
     this.shape = shape;
     this.size = this.tiles.getWidth() / 2;
-    const steps = 50;
+    this.steps = 50;
     this.directions = {
-        "N": (new Point(0, -this.size / steps)).convert(),
-        "S": (new Point(0, this.size / steps)).convert(),
-        "E": (new Point(this.size / steps, 0)).convert(),
-        "W": (new Point(-this.size / steps, 0)).convert(),
+        "N": (new Point(0, -this.size / this.steps)).convert(),
+        "S": (new Point(0, this.size / this.steps)).convert(),
+        "E": (new Point(this.size / this.steps, 0)).convert(),
+        "W": (new Point(-this.size / this.steps, 0)).convert(),
     };
     this.structure = new MapStructure();
     this.applyLevel = function(level) {
@@ -24,6 +24,13 @@ function Map(tiles, shape) {
         const iPoint = this.topOfTileAt(gridPoint);
         this.shape.draw(iPoint.x, iPoint.y, this.size, this.size,
             "silver",  "rgba(255, 255, 255, 0.20)");
+    };
+    this.movement = function(progress) {
+        if (progress.traveled % this.steps < progress.speed)
+            progress.heading = this.heading(progress.point, progress.heading);
+        const trajectory = this.directions[progress.heading];
+        progress.point.iAdd(trajectory.multi(progress.speed));
+        progress.traveled += progress.speed;
     };
     this.heading = function(point, heading) {
         return this.tiles.movement(this.tileValueAt(point), heading);

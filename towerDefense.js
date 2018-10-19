@@ -17,7 +17,8 @@ function Game(bgCanvas, fgCanvas) {
     };
     this.map = new Map(
         new TileSet(this.sprites["roads"]), new IsoTangle(this.fgContext));
-    this.enemies = new Enemies(new HealthBar(this.fgContext));
+    this.enemies = new Enemies(
+        new HealthBar(this.fgContext), this.map.movement.bind(this.map));
     this.defense = new DefenseNetwork(this.sprites["towers"],
         new Orb(this.fgContext), new IsoCircle(this.fgContext));
     this.init = function() {
@@ -61,7 +62,7 @@ function Game(bgCanvas, fgCanvas) {
         this.drawFromMiddle(this.fgContext, this.drawForeground.bind(this));
     };
     this.update = function() {
-        this.enemies.move(this.map.heading.bind(this.map), this.map.directions);
+        this.enemies.update();
         this.defense.update(
             this.enemies.positions.bind(this.enemies),
             this.enemies.hit.bind(this.enemies));

@@ -1,13 +1,14 @@
-function Enemies(healthBarShape) {
+function Enemies(healthBarShape, mapMovement) {
     this.healthBarShape = healthBarShape;
+    this.mapMovement = mapMovement;
     this.waveInfo = this.enemies = [];
     this.newWaves = function(waveInfo) {
         this.waveInfo = waveInfo;
         this.currentWave = this.waveInfo.shift();
     };
-    this.move = function(headingFunc, directions) {
+    this.update = function() {
         for (let creep of this.enemies)
-            creep.update(headingFunc, directions);
+            creep.update();
     };
     this.updateWave = function() {
         this.enemies = this.enemies.filter(creep => creep.health > 0);
@@ -19,18 +20,18 @@ function Enemies(healthBarShape) {
     this.createCreep = function() {
         if (this.isSpaced()) {
             this.enemies.push(new Creep(
-                this.healthBarShape, this.currentWave));
+                this.healthBarShape, this.mapMovement, this.currentWave));
             --this.currentWave.amount;
         }
     };
     this.isSpaced = function() {
         if (this.enemies.length == 0) return true;
         const lastIdx = this.enemies.length - 1;
-        return this.enemies[lastIdx].traveled > this.currentWave.spacing;
+        return this.enemies[lastIdx].traveled() > this.currentWave.spacing;
     };
     this.positions = function*() {
         for (enemy of this.enemies)
-            yield enemy.point;
+            yield enemy.point();
     };
     this.draw = function() {
         for (creep of this.enemies)
@@ -39,7 +40,7 @@ function Enemies(healthBarShape) {
             creep.draw();
     };
     this.hit = function(withinRange, damageAmount) {
-        let creep = this.enemies.find(creep => withinRange(creep.point, 5));
+        let creep = this.enemies.find(creep => withinRange(creep.point(), 5));
         try { creep.damage(damageAmount); }
         catch (_) { return false; }
         return true;
@@ -47,48 +48,45 @@ function Enemies(healthBarShape) {
     this.return;
 }
 
-function Creep(healthBarShape, {sprite, start, heading, speed, health}) {
+function Creep(healthBarShape, mapMovement, waveAttributes) {
     this.healthBarShape = healthBarShape;
-    this.sprite = sprite;
-    this.point = start.add(0, -this.sprite.height / 4);
-    this.heading = heading;
-    this.speed = speed;
-    this.health = health;
-    this.center = new Point(-this.sprite.width / 2, -this.sprite.height / 2);
-    this.col = this.traveled = 0;
-    this.changeFacing = { "N": 0, "S": 1, "E": 2, "W": 3 };
-    this.facing = this.changeFacing[this.heading];
-    this.update = function(headingFunc, directions) {
-        if (this.traveled % 50 < this.speed)
-            try { this.setHeading(headingFunc); }
-            catch (e) {this.updateCatch(e)}
-        this.move(directions);
-    }
-    this.setHeading = function(headingFunc) {
-        this.heading = headingFunc(this.point, this.heading);
-        this.facing = this.changeFacing[this.heading];
+    this.mapMovement = mapMovement;
+    this.sprite = waveAttributes.sprite;
+    this.progress = {
+        "point": waveAttributes.start.add(0, -this.sprite.height / 4),
+        "heading": waveAttributes.heading,
+        "speed": waveAttributes.speed,
+        "traveled": 0,
     };
+    this.health = waveAttributes.health;
+    this.center = new Point(-this.sprite.width / 2, -this.sprite.height / 2);
+    this.facing = { "N": 0, "S": 1, "E": 2, "W": 3 };
+    this.update = function() {
+        try { this.mapMovement(this.progress); }
+        catch (e) {this.updateCatch(e)}
+    }
     this.updateCatch = function(error) {
         if (error === "Off map")
             this.health = 0;
         else
             throw error;
     };
-    this.move = function(directions) {
-        this.increment += this.speed;
-        this.traveled += this.speed;
-        this.col = Math.floor(this.traveled / 5);
-        const trajectory = directions[this.heading].multi(this.speed);
-        this.point = this.point.add(trajectory.x, trajectory.y);
-    };
     this.drawHealth = function(initHealth) {
-        const drawPos = this.point.add(this.center.x, this.center.y).floor();
+        const drawPos = this.point().add(this.center.x, this.center.y).floor();
         this.healthBarShape.draw(drawPos.x, drawPos.y + this.sprite.height,
             this.sprite.width, 5, "Black", this.health/initHealth);
     };
     this.draw = function() {
-        const drawPos = this.point.add(this.center.x, this.center.y).floor();
-        this.sprite.draw(this.col, this.facing, drawPos.x, drawPos.y);
+        const animation = Math.floor(this.progress.traveled / 5);
+        const facing = this.facing[this.progress.heading];
+        const drawPos = this.point().add(this.center.x, this.center.y).floor();
+        this.sprite.draw(animation, facing, drawPos.x, drawPos.y);
+    };
+    this.point = function() {
+        return this.progress.point;
+    };
+    this.traveled = function() {
+        return this.progress.traveled;
     };
     this.damage = function(amount) {
         this.health -= amount;
