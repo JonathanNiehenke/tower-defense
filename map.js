@@ -12,7 +12,8 @@ function Map(tiles, shape) {
     this.structure = new MapStructure();
     this.applyLevel = function(level) {
         this.structure.new(level.mapArray);
-        this.start = this.centerOfTileAt(this.toIso(level.startTile));
+        this.start = level.startTile.map(
+            point => this.centerOfTileAt(this.toIso(point)));
     };
     this.draw = function() {
         for (const [point, val] of this.structure.iter()) {

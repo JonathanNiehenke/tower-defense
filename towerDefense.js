@@ -32,17 +32,17 @@ function Game(bgCanvas, fgCanvas) {
                 [0, 0, 0, 2, 0, 0, 0],
                 [3, 3, 3, 5, 0, 0, 0]
             ],
-            "startTile": new Point(0, 6),
+            "startTile": [new Point(0, 6), new Point(0, 3)],
         });
         let slime = this.sprites["slime"];
         this.enemies.newWaves([
-            {"sprite": slime, "amount": 6, "start": this.map.start,
+            {"sprite": slime, "amount": 6, "start": this.map.start[0],
              "heading": "E", "spacing": 70, "speed": 1, "health": 20},
-            {"sprite": slime, "amount": 6, "start": this.map.start,
+            {"sprite": slime, "amount": 6, "start": this.map.start[1],
              "heading": "E", "spacing": 60, "speed": 2, "health": 20},
-            {"sprite": slime, "amount": 6, "start": this.map.start,
+            {"sprite": slime, "amount": 6, "start": this.map.start[1],
              "heading": "E", "spacing": 30, "speed": 1, "health": 20},
-            {"sprite": slime, "amount": 24, "start": this.map.start,
+            {"sprite": slime, "amount": 24, "start": this.map.start[0],
              "heading": "E", "spacing": 30, "speed": 0.5, "health": 20},
         ]);
         let point = this.map.centerOfTileAt(
