@@ -10,10 +10,8 @@ function Map(tiles, shape) {
         "W": (new Point(-this.size / this.steps, 0)).convert(),
     };
     this.structure = new MapStructure();
-    this.applyLevel = function(level) {
-        this.structure.new(level.mapArray);
-        this.start = level.startTile.map(
-            point => this.centerOfTileAt(this.toIso(point)));
+    this.applyLevel = function(structure) {
+        this.structure.new(structure);
     };
     this.draw = function() {
         for (const [point, val] of this.structure.iter()) {
@@ -41,6 +39,9 @@ function Map(tiles, shape) {
     };
     this.tileValueAt = function(isoPoint) {
         return this.structure.value(this.gridPosAt(isoPoint));
+    };
+    this.startPos = function([x, y]) {
+        return this.centerOfTileAt(this.toIso(new Point(x, y)));
     };
     this.centerOfTileAt = function(isoPoint) {
         return this.topOfTileAt(isoPoint).add(0, this.size / 2);
