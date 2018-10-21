@@ -1,4 +1,5 @@
-function Enemies(healthBarShape, mapMovement) {
+function Enemies(sprite, healthBarShape, mapMovement) {
+    this.sprite = sprite;
     this.healthBarShape = healthBarShape;
     this.mapMovement = mapMovement;
     this.waveInfo = this.enemies = [];
@@ -19,7 +20,7 @@ function Enemies(healthBarShape, mapMovement) {
     };
     this.createCreep = function() {
         if (this.isSpaced()) {
-            this.enemies.push(new Creep(
+            this.enemies.push(new Creep(this.sprite,
                 this.healthBarShape, this.mapMovement, this.currentWave));
             --this.currentWave.amount;
         }
@@ -48,10 +49,10 @@ function Enemies(healthBarShape, mapMovement) {
     this.return;
 }
 
-function Creep(healthBarShape, mapMovement, waveAttributes) {
+function Creep(sprite, healthBarShape, mapMovement, waveAttributes) {
+    this.sprite = sprite;
     this.healthBarShape = healthBarShape;
     this.mapMovement = mapMovement;
-    this.sprite = waveAttributes.sprite;
     this.progress = {
         "point": waveAttributes.start.add(0, -this.sprite.height / 4),
         "heading": waveAttributes.heading,

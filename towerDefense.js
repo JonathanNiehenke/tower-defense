@@ -17,31 +17,14 @@ function Game(bgCanvas, fgCanvas) {
     };
     this.map = new Map(
         new TileSet(this.sprites["roads"]), new IsoTangle(this.fgContext));
-    this.enemies = new Enemies(
+    this.enemies = new Enemies(this.sprites["slime"],
         new HealthBar(this.fgContext), this.map.movement.bind(this.map));
     this.defense = new DefenseNetwork(this.sprites["towers"],
         new Orb(this.fgContext), new IsoCircle(this.fgContext));
     this.init = function() {
-        this.map.applyLevel([
-                [0, 6, 3, 3, 3, 7, 0],
-                [0, 2, 0, 0, 0, 4, 7],
-                [0, 2, 0, 0, 0, 0, 2],
-                [3, 5, 0, 6, 7, 0, 2],
-                [0, 0, 0, 2, 4, 3, 5],
-                [0, 0, 0, 2, 0, 0, 0],
-                [3, 3, 3, 5, 0, 0, 0]
-        ]);
-        let slime = this.sprites["slime"];
-        this.enemies.newWaves([
-            {"sprite": slime, "amount": 6, "start": this.map.startPos([0, 6]),
-             "heading": "E", "spacing": 70, "speed": 1, "health": 20},
-            {"sprite": slime, "amount": 6, "start": this.map.startPos([0, 3]),
-             "heading": "E", "spacing": 60, "speed": 2, "health": 20},
-            {"sprite": slime, "amount": 6, "start": this.map.startPos([0, 3]),
-             "heading": "E", "spacing": 30, "speed": 1, "health": 20},
-            {"sprite": slime, "amount": 6, "start": this.map.startPos([0, 6]),
-             "heading": "E", "spacing": 30, "speed": 0.5, "health": 20},
-        ]);
+        this.map.applyLevel(level.structure);
+        level.waves.forEach(wave => wave.start = this.map.startPos(wave.start));
+        this.enemies.newWaves(level.waves);
         this.defense.place(6, this.map.startPos([2, 2]));
         this.defense.place(1, this.map.startPos([6, 0]));
         this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
