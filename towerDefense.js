@@ -22,6 +22,8 @@ function Game(bgCanvas, fgCanvas) {
         new HealthBar(this.fgContext), this.map.movement.bind(this.map));
     this.defense = new DefenseNetwork(this.sprites["towers"],
         new Orb(this.fgContext), new IsoCircle(this.fgContext));
+    this.menu = new Menu(
+        this.sprites["towers"], new Point(20, 380), new Point(30, 0));
     this.init = function() {
         this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
         this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
@@ -41,6 +43,8 @@ function Game(bgCanvas, fgCanvas) {
     this.loop = function() {
         this.update();
         this.drawFromMiddle(this.fgContext, this.drawForeground.bind(this));
+        for (let i = 0; i < 9; ++i)
+            this.menu.draw(6, i*3, i, 0);
     };
     this.update = function() {
         this.enemies.update();
