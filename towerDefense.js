@@ -43,7 +43,13 @@ function Game(bgCanvas, fgCanvas) {
             this.enemies.positions.bind(this.enemies),
             this.enemies.hit.bind(this.enemies));
         try { this.enemies.updateWave(); }
-        catch (_) { this.end(); }
+        catch (e) { this.catchEndWave(e); }
+    };
+    this.catchEndWave = function(error) {
+        if (error == "end of wave")
+            this.end();
+        else
+            throw error;
     };
     this.drawFromMiddle = function(context, drawFunc) {
         context.save();

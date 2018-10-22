@@ -13,7 +13,9 @@ function Enemies(sprite, healthBarShape, mapMovement) {
     };
     this.updateWave = function() {
         this.enemies = this.enemies.filter(creep => creep.health > 0);
-        if (this.currentWave.amount)
+        if (this.currentWave === undefined)
+            throw "end of wave";
+        else if (this.currentWave.amount)
             this.createCreep();
         else if (this.enemies.length == 0)
             this.currentWave = this.waveInfo.shift();
