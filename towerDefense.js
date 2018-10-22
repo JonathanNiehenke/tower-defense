@@ -27,8 +27,8 @@ function Game(bgCanvas, fgCanvas) {
         this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
         this.canvas.addEventListener("mouseup", this.mouseUp.bind(this));
         this.loadLevel(this.levelNum++);
-        this.defense.place(6, this.map.startPos([2, 2]));
-        this.defense.place(1, this.map.startPos([6, 0]));
+        this.defense.place(6, this.map.startPos([4, 2]));
+        this.defense.place(6, this.map.startPos([2, 4]));
         this.animation = setInterval(this.loop.bind(this), 28);
     };
     this.loadLevel = function(num=0) {
