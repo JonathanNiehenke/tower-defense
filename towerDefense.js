@@ -10,6 +10,7 @@ function Game(bgCanvas, fgCanvas) {
     this.fgContext = fgCanvas.getContext('2d');
     this.mousePos = new Point(-1, -1);
     this.animation = undefined;
+    this.levelNum = 0;
     this.sprites = {
         "towers": new Sprite(this.fgContext, "sprites/Towers.png", 27, 8),
         "roads": new Sprite(this.bgContext,  "sprites/IsoRoadSet_Kenney.png", 2, 4),
@@ -22,16 +23,20 @@ function Game(bgCanvas, fgCanvas) {
     this.defense = new DefenseNetwork(this.sprites["towers"],
         new Orb(this.fgContext), new IsoCircle(this.fgContext));
     this.init = function() {
-        this.map.applyLevel(level.structure);
-        level.waves.forEach(wave => wave.start = this.map.startPos(wave.start));
-        this.enemies.newWaves(level.waves);
-        this.defense.place(6, this.map.startPos([2, 2]));
-        this.defense.place(1, this.map.startPos([6, 0]));
         this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
         this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
         this.canvas.addEventListener("mouseup", this.mouseUp.bind(this));
-        this.drawFromMiddle(this.bgContext, this.map.draw.bind(this.map));
+        this.loadLevel(this.levelNum++);
+        this.defense.place(6, this.map.startPos([2, 2]));
+        this.defense.place(1, this.map.startPos([6, 0]));
         this.animation = setInterval(this.loop.bind(this), 28);
+    };
+    this.loadLevel = function(num=0) {
+        this.map.applyLevel(levels[num].structure);
+        levels[num].waves.forEach(
+            wave => wave.start = this.map.startPos(wave.start));
+        this.enemies.newWaves(levels[num].waves);
+        this.drawFromMiddle(this.bgContext, this.map.draw.bind(this.map));
     };
     this.loop = function() {
         this.update();
@@ -46,10 +51,10 @@ function Game(bgCanvas, fgCanvas) {
         catch (e) { this.catchEndWave(e); }
     };
     this.catchEndWave = function(error) {
-        if (error == "end of wave")
-            this.end();
-        else
+        if (error != "end of wave")
             throw error;
+        try { this.loadLevel(this.levelNum++) }
+        catch (_) { this.end(); }
     };
     this.drawFromMiddle = function(context, drawFunc) {
         context.save();
