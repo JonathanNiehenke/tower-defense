@@ -29,15 +29,15 @@ function Game(bgCanvas, fgCanvas) {
         this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
         this.canvas.addEventListener("mouseup", this.mouseUp.bind(this));
         this.loadLevel(this.levelNum++);
-        this.animation = setInterval(this.loop.bind(this), 28);
     };
     this.loadLevel = function(num=0) {
+        this.defense.clear();
         this.map.applyLevel(levels[num].structure);
         levels[num].waves.forEach(
             wave => wave.start = this.map.startPos(wave.start));
         this.enemies.newWaves(levels[num].waves);
-        this.defense.clear();
         this.drawFromMiddle(this.bgContext, this.map.draw.bind(this.map));
+        this.animation = setInterval(this.loop.bind(this), 28);
     };
     this.loop = function() {
         this.update();
@@ -50,11 +50,17 @@ function Game(bgCanvas, fgCanvas) {
             this.enemies.positions.bind(this.enemies),
             this.enemies.hit.bind(this.enemies));
         try { this.enemies.updateWave(); }
-        catch (e) { this.catchEndWave(e); }
+        catch (e) { this.catchEndLevel(e); }
     };
-    this.catchEndWave = function(error) {
-        if (error != "end of wave")
+    this.catchEndLevel = function(error) {
+        if (error === "end of level")
+	        this.endLevel();
+        else
             throw error;
+    };
+    this.endLevel = function() {
+        clearInterval(this.animation);
+        alert("Level complete");
         try { this.loadLevel(this.levelNum++) }
         catch (_) { this.end(); }
     };
