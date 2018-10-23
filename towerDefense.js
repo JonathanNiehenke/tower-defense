@@ -29,8 +29,6 @@ function Game(bgCanvas, fgCanvas) {
         this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
         this.canvas.addEventListener("mouseup", this.mouseUp.bind(this));
         this.loadLevel(this.levelNum++);
-        this.defense.place(6, this.map.startPos([4, 2]));
-        this.defense.place(6, this.map.startPos([2, 4]));
         this.animation = setInterval(this.loop.bind(this), 28);
     };
     this.loadLevel = function(num=0) {
@@ -43,7 +41,7 @@ function Game(bgCanvas, fgCanvas) {
     this.loop = function() {
         this.update();
         this.drawFromMiddle(this.fgContext, this.drawForeground.bind(this));
-        this.towerMenu.draw();
+        this.towerMenu.draw(this.mousePos);
     };
     this.update = function() {
         this.enemies.update();
@@ -82,8 +80,14 @@ function Game(bgCanvas, fgCanvas) {
     this.mouseDown = function() {
         if (this.map.isMap(this.mouseToIso()))
             this.defense.upgradeAt(this.map.centerOfTileAt(this.mouseToIso()));
+        this.towerMenu.mouseDown(this.mousePos);
     };
     this.mouseUp = function() {
+        const type = this.towerMenu.mouseUpValue();
+        if (type !== undefined && this.map.isMap(this.mouseToIso())) {
+            this.defense.place(
+                type, this.map.centerOfTileAt(this.mouseToIso()));
+        }
     };
     this.mouseToIso = function() {
         return new Point(this.mousePos.x - this.canvas.width / 2,
