@@ -1,9 +1,3 @@
-function loadImage(Name) {
-    let img = new Image();
-    img.src = Name;
-    return img;
-}
-
 // Object that holds a point and converts between Cartesian and Isometric
 function Point(x, y, type="Cartesian") {
     this.x = x;

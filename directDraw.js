@@ -1,3 +1,9 @@
+function loadImage(Name) {
+    let img = new Image();
+    img.src = Name;
+    return img;
+}
+
 function Sprite(context, imgSheet, imgRows, imgCols) {
     this.context = context;
     this.img = loadImage(imgSheet);
