@@ -22,6 +22,27 @@ let levels = [
     },
     {
         "structure": [
+            [3, 3, 3, 3, 3, 3, 7],
+            [3, 7, 0, 0, 0, 6, 5],
+            [0, 4, 7, 0, 6, 5, 0],
+            [0, 0, 2, 0, 2, 0, 0],
+            [0, 6, 5, 0, 4, 7, 0],
+            [6, 5, 0, 0, 0, 4, 7],
+            [4, 3, 3, 3, 3, 3, 5],
+        ],
+        "waves": [
+            {"amount": 6, "start": [0, 0], "heading": "E", "spacing": 80,
+                "speed": 1, "health": 20},
+            {"amount": 8, "start": [0, 0], "heading": "E", "spacing": 60,
+                "speed": 1, "health": 20},
+            {"amount": 12, "start": [0, 0], "heading": "E", "spacing": 40,
+                "speed": 1, "health": 20},
+            {"amount": 24, "start": [0, 0], "heading": "E", "spacing": 20,
+                "speed": 1, "health": 20},
+        ],
+    },
+    {
+        "structure": [
             [0, 0, 0, 0, 0, 0, 0],
             [0, 6, 3, 3, 3, 3, 3],
             [0, 4, 7, 0, 0, 0, 0],
