@@ -37,6 +37,9 @@ function Map(tiles, shape) {
     this.isMap = function(isoPoint) {
         return this.tileValueAt(isoPoint) !== undefined;
     };
+    this.pointIs = function(isoPoint, val) {
+        return this.tileValueAt(isoPoint) === val;
+    };
     this.tileValueAt = function(isoPoint) {
         return this.structure.value(this.gridPosAt(isoPoint));
     };

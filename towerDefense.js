@@ -84,7 +84,7 @@ function Game(bgCanvas, fgCanvas) {
     };
     this.mouseUp = function() {
         const type = this.towerMenu.mouseUpValue();
-        if (type !== undefined && this.map.isMap(this.mouseToIso())) {
+        if (type !== undefined && this.map.pointIs(this.mouseToIso(), 0)) {
             this.defense.place(
                 type, this.map.centerOfTileAt(this.mouseToIso()));
         }
