@@ -1,3 +1,13 @@
+function TowerMenu(sprite, origin, spacing, displayNum) {
+    this.menu = new Menu(sprite, origin, spacing);
+    this.displayNum = displayNum;
+    this.draw = function() {
+        for (let i = 0; i < this.displayNum; ++i)
+            this.menu.draw(0, i*3, i, 0);
+    };
+    return this;
+}
+
 function Menu(sprite, origin, spacing) {
     this.sprite = sprite;
     this.origin = origin;
