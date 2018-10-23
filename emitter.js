@@ -25,6 +25,9 @@ function Emitter(shape) {
         particle.apply(point, direction, attributes);
         this.living.push(particle);
     };
+    this.clear = function() {
+        this.dead.push(...this.living.splice(0, this.living.length));
+    };
     return this;
 };
 

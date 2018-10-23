@@ -36,6 +36,7 @@ function Game(bgCanvas, fgCanvas) {
         levels[num].waves.forEach(
             wave => wave.start = this.map.startPos(wave.start));
         this.enemies.newWaves(levels[num].waves);
+        this.defense.clear();
         this.drawFromMiddle(this.bgContext, this.map.draw.bind(this.map));
     };
     this.loop = function() {

@@ -26,6 +26,10 @@ function DefenseNetwork(sprite, particleShape, rangeShape) {
     this.towerAt = function(point) {
         return this.towers.find(tower => tower.isAt(point));
     };
+    this.clear = function() {
+        this.towers.splice(0, this.towers.length);
+        this.emitter.clear();
+    };
     return this;
 }
 
