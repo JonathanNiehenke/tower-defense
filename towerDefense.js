@@ -41,8 +41,7 @@ function Game(bgCanvas, fgCanvas) {
     };
     this.loop = function() {
         this.update();
-        this.drawFromMiddle(this.fgContext, this.drawForeground.bind(this));
-        this.towerMenu.draw(this.mousePos);
+        this.draw();
     };
     this.update = function() {
         this.enemies.update();
@@ -64,14 +63,8 @@ function Game(bgCanvas, fgCanvas) {
         try { this.loadLevel(this.levelNum++) }
         catch (_) { this.end(); }
     };
-    this.drawFromMiddle = function(context, drawFunc) {
-        context.save();
-        context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        context.translate(this.canvas.width / 2, 0);
-        drawFunc();
-        context.restore();
-    };
-    this.drawForeground = function() {
+    this.draw = function() {
+        this.fgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
         if (this.map.isMap(this.mouseToIso())) {
             this.map.highlightTileAt(this.mouseToIso());
             this.defense.highlightRangeAt(
@@ -79,6 +72,7 @@ function Game(bgCanvas, fgCanvas) {
         }
         this.enemies.draw();
         this.defense.draw();
+        this.towerMenu.draw(this.mousePos);
     };
     this.mouseMove = function(e) {
         let rect = this.canvas.getBoundingClientRect();

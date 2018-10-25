@@ -4,10 +4,10 @@ function Map(tiles, shape) {
     this.size = this.tiles.getWidth();
     this.steps = 50;
     this.directions = {
-        "N": (new Point(0, -this.size / this.steps)).convert(),
-        "S": (new Point(0, this.size / this.steps)).convert(),
-        "E": (new Point(this.size / this.steps, 0)).convert(),
-        "W": (new Point(-this.size / this.steps, 0)).convert(),
+        "N": (new Point(0, -this.size / this.steps)),
+        "S": (new Point(0, this.size / this.steps)),
+        "E": (new Point(this.size / this.steps, 0)),
+        "W": (new Point(-this.size / this.steps, 0)),
     };
     this.structure = new MapStructure();
     this.applyLevel = function(structure) {
@@ -32,29 +32,28 @@ function Map(tiles, shape) {
     this.heading = function(point, heading) {
         return this.tiles.movement(this.tileValueAt(point), heading);
     };
-    this.isMap = function(isoPoint) {
-        return this.tileValueAt(isoPoint) !== undefined;
+    this.isMap = function(point) {
+        return this.tileValueAt(point) !== undefined;
     };
-    this.pointIs = function(isoPoint, val) {
-        return this.tileValueAt(isoPoint) === val;
+    this.pointIs = function(point, val) {
+        return this.tileValueAt(point) === val;
     };
-    this.tileValueAt = function(isoPoint) {
-        return this.structure.value(this.gridPosAt(isoPoint));
+    this.tileValueAt = function(point) {
+        return this.structure.value(this.gridPosAt(point));
     };
     this.startPos = function([x, y]) {
-        return this.centerOfTileAt(this.toIso(new Point(x, y)));
+        return this.centerOfTileAt(this.toTile(new Point(x, y)));
     };
-    this.centerOfTileAt = function(isoPoint) {
-        return this.topOfTileAt(isoPoint).add(0, this.size / 2);
+    this.centerOfTileAt = function(point) {
+        return this.topOfTileAt(point).add(this.size / 2);
     };
-    this.topOfTileAt = function(isoPoint) {
-        return this.toIso(this.gridPosAt(isoPoint));
+    this.topOfTileAt = function(point) {
+        return this.toTile(this.gridPosAt(point));
     };
-    this.toIso = function(gridPoint) {
-        return gridPoint.multi(this.size).convert()
+    this.toTile = function(gridPoint) {
+        return gridPoint.multi(this.size);
     };
     this.gridPosAt = function(Point) {
-        Point = Point.type == "Cartesian" ? Point : Point.convert();
         return Point.fdiv(this.size);
     };
     return this;
