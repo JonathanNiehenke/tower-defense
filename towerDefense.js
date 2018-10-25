@@ -65,10 +65,10 @@ function Game(bgCanvas, fgCanvas) {
     };
     this.draw = function() {
         this.fgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        if (this.map.isMap(this.mouseToIso())) {
-            this.map.highlightTileAt(this.mouseToIso());
+        if (this.map.isMap(this.mousePos)) {
+            this.map.highlightTileAt(this.mousePos);
             this.defense.highlightRangeAt(
-                this.map.centerOfTileAt(this.mouseToIso()));
+                this.map.centerOfTileAt(this.mousePos));
         }
         this.enemies.draw();
         this.defense.draw();
@@ -79,20 +79,16 @@ function Game(bgCanvas, fgCanvas) {
         this.mousePos.change(e.clientX - rect.x, e.clientY - rect.y);
     };
     this.mouseDown = function() {
-        if (this.map.isMap(this.mouseToIso()))
-            this.defense.upgradeAt(this.map.centerOfTileAt(this.mouseToIso()));
+        if (this.map.isMap(this.mousePos))
+            this.defense.upgradeAt(this.map.centerOfTileAt(this.mousePos));
         this.towerMenu.mouseDown(this.mousePos);
     };
     this.mouseUp = function() {
         const type = this.towerMenu.mouseUpValue();
-        if (type !== undefined && this.map.pointIs(this.mouseToIso(), 0)) {
+        if (type !== undefined && this.map.pointIs(this.mousePos, 0)) {
             this.defense.place(
-                type, this.map.centerOfTileAt(this.mouseToIso()));
+                type, this.map.centerOfTileAt(this.mousePos));
         }
-    };
-    this.mouseToIso = function() {
-        return new Point(this.mousePos.x - this.canvas.width / 2,
-            this.mousePos.y, "isometric");
     };
     this.end = function() {
         clearInterval(this.animation);
