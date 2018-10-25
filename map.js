@@ -1,7 +1,7 @@
 function Map(tiles, shape) {
     this.tiles = tiles;
     this.shape = shape;
-    this.size = this.tiles.getWidth() / 2;
+    this.size = this.tiles.getWidth();
     this.steps = 50;
     this.directions = {
         "N": (new Point(0, -this.size / this.steps)).convert(),
@@ -14,10 +14,8 @@ function Map(tiles, shape) {
         this.structure.new(structure);
     };
     this.draw = function() {
-        for (const [point, val] of this.structure.iter()) {
-            const iPoint = this.toIso(point);
-            this.tiles.draw(iPoint.x - this.size, iPoint.y, val);
-        }
+        for (const [point, val] of this.structure.iter())
+            this.tiles.draw(point.x * this.size, point.y * this.size, val);
     };
     this.highlightTileAt = function(gridPoint) {
         const iPoint = this.topOfTileAt(gridPoint);

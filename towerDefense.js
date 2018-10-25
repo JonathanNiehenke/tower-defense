@@ -13,7 +13,7 @@ function Game(bgCanvas, fgCanvas) {
     this.levelNum = 0;
     this.sprites = {
         "towers": new Sprite(this.fgContext, "sprites/Towers.png", 27, 8),
-        "roads": new Sprite(this.bgContext,  "sprites/IsoRoadSet_Kenney.png", 2, 4),
+        "roads": new Sprite(this.bgContext,  "sprites/RoadSet_Kenney.png", 2, 4),
         "slime": new Sprite(this.fgContext, "sprites/SlimeIso.png", 4, 4),
     };
     this.map = new Map(
@@ -36,7 +36,7 @@ function Game(bgCanvas, fgCanvas) {
         levels[num].waves.forEach(
             wave => wave.start = this.map.startPos(wave.start));
         this.enemies.newWaves(levels[num].waves);
-        this.drawFromMiddle(this.bgContext, this.map.draw.bind(this.map));
+        this.map.draw();
         this.animation = setInterval(this.loop.bind(this), 28);
     };
     this.loop = function() {
