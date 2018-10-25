@@ -19,21 +19,21 @@ function Sprite(context, imgSheet, imgRows, imgCols) {
     return this;
 }
 
-function IsoTangle(context) {
+function Rectangle(context) {
     this.context = context;
-    this.draw = function(x, y, length, width, stroke, fill) {
-        this.path(x, y, length, width / 2);
+    this.draw = function(x, y, width, height, stroke, fill) {
+        this.path(x, y, width, height);
         context.strokeStyle = stroke;
         context.fillStyle = fill;
         context.stroke();
         context.fill();
     };
-    this.path = function(x, y, length, width) {
+    this.path = function(x, y, width, height) {
         this.context.beginPath();
         this.context.moveTo(x, y);
-        this.context.lineTo(x + length, y + width);
-        this.context.lineTo(x, y + length);
-        this.context.lineTo(x - length, y + width);
+        this.context.lineTo(x + width, y);
+        this.context.lineTo(x + width, y + height);
+        this.context.lineTo(x, y + height);
         this.context.closePath();
     };
     return this;
