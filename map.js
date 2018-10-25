@@ -45,7 +45,7 @@ function Map(tiles, shape) {
         return this.centerOfTileAt(this.toTile(new Point(x, y)));
     };
     this.centerOfTileAt = function(point) {
-        return this.topOfTileAt(point).add(this.size / 2);
+        return this.topOfTileAt(point).add(this.size / 2, this.size / 2);
     };
     this.topOfTileAt = function(point) {
         return this.toTile(this.gridPosAt(point));
@@ -53,8 +53,8 @@ function Map(tiles, shape) {
     this.toTile = function(gridPoint) {
         return gridPoint.multi(this.size);
     };
-    this.gridPosAt = function(Point) {
-        return Point.fdiv(this.size);
+    this.gridPosAt = function(point) {
+        return point.div(this.size).floor();
     };
     return this;
 }
