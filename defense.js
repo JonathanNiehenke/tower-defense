@@ -35,41 +35,41 @@ function DefenseNetwork(sprite, particleShape, rangeShape) {
 
 let towerTypes = [
     [ // cannon
-        {"damage": 8, "range": 42, "pAmount": 1, "pSize": 12, "reload": 75, "speed": 6},
-        {"damage": 12, "range": 42, "pAmount": 1, "pSize": 12, "reload": 75, "speed": 6},
-        {"damage": 16, "range": 42, "pAmount": 1, "pSize": 12, "reload": 75, "speed": 6}, ],
+        {"damage": 8, "range": 84, "pAmount": 1, "pSize": 12, "reload": 75, "speed": 6},
+        {"damage": 12, "range": 84, "pAmount": 1, "pSize": 12, "reload": 75, "speed": 6},
+        {"damage": 16, "range": 84, "pAmount": 1, "pSize": 12, "reload": 75, "speed": 6}, ],
     [ // flame
-        {"damage": 0.2, "range": 42, "pAmount": 20, "pSize": 5, "reload": 0, "speed": 6},
-        {"damage": 0.35, "range": 42, "pAmount": 20, "pSize": 5, "reload": 0, "speed": 6},
-        {"damage": 0.5, "range": 42, "pAmount": 20, "pSize": 5, "reload": 0, "speed": 6}, ],
+        {"damage": 0.2, "range": 84, "pAmount": 20, "pSize": 5, "reload": 0, "speed": 6},
+        {"damage": 0.35, "range": 84, "pAmount": 20, "pSize": 5, "reload": 0, "speed": 6},
+        {"damage": 0.5, "range": 84, "pAmount": 20, "pSize": 5, "reload": 0, "speed": 6}, ],
     [// tesla
-        {"damage": 0.3, "range": 42, "pAmount": 20, "pSize": 5, "reload": 0, "speed": 6},
-        {"damage": 0.3, "range": 52, "pAmount": 20, "pSize": 5, "reload": 0, "speed": 6},
-        {"damage": 0.3, "range": 62, "pAmount": 20, "pSize": 5, "reload": 0, "speed": 6}, ],
+        {"damage": 0.3, "range": 84, "pAmount": 20, "pSize": 5, "reload": 0, "speed": 6},
+        {"damage": 0.3, "range": 104, "pAmount": 20, "pSize": 5, "reload": 0, "speed": 6},
+        {"damage": 0.3, "range": 124, "pAmount": 20, "pSize": 5, "reload": 0, "speed": 6}, ],
     [ // egg gun
-        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 12, "reload": 30, "speed": 2},
-        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 12, "reload": 25, "speed": 2},
-        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 12, "reload": 20, "speed": 2}, ],
+        {"damage": 4, "range": 96, "pAmount": 3, "pSize": 12, "reload": 30, "speed": 2},
+        {"damage": 4, "range": 96, "pAmount": 3, "pSize": 12, "reload": 25, "speed": 2},
+        {"damage": 4, "range": 96, "pAmount": 3, "pSize": 12, "reload": 20, "speed": 2}, ],
     [ // machine gun
-        {"damage": 0.5, "range": 62, "pAmount": 6, "pSize": 5, "reload": 6, "speed": 6},
-        {"damage": 1.0, "range": 62, "pAmount": 6, "pSize": 5, "reload": 6, "speed": 6},
-        {"damage": 1.5, "range": 62, "pAmount": 6, "pSize": 5, "reload": 6, "speed": 6}, ],
+        {"damage": 0.5, "range": 124, "pAmount": 6, "pSize": 5, "reload": 6, "speed": 6},
+        {"damage": 1.0, "range": 124, "pAmount": 6, "pSize": 5, "reload": 6, "speed": 6},
+        {"damage": 1.5, "range": 124, "pAmount": 6, "pSize": 5, "reload": 6, "speed": 6}, ],
     [ // untitled
-        {"damage": 8, "range": 62, "pAmount": 6, "pSize": 4, "reload": 15, "speed": 2},
-        {"damage": 8, "range": 62, "pAmount": 6, "pSize": 4, "reload": 15, "speed": 4},
-        {"damage": 8, "range": 62, "pAmount": 6, "pSize": 4, "reload": 15, "speed": 6}, ],
+        {"damage": 8, "range": 124, "pAmount": 6, "pSize": 4, "reload": 15, "speed": 2},
+        {"damage": 8, "range": 124, "pAmount": 6, "pSize": 4, "reload": 15, "speed": 4},
+        {"damage": 8, "range": 124, "pAmount": 6, "pSize": 4, "reload": 15, "speed": 6}, ],
     [ // missile
-        {"damage": 3, "range": 80, "pAmount": 6, "pSize": 12, "reload": 30, "speed": 12},
-        {"damage": 3, "range": 120, "pAmount": 6, "pSize": 12, "reload": 30, "speed": 12},
-        {"damage": 3, "range": 160, "pAmount": 6, "pSize": 12, "reload": 30, "speed": 12}, ],
+        {"damage": 3, "range": 160, "pAmount": 6, "pSize": 12, "reload": 30, "speed": 12},
+        {"damage": 3, "range": 240, "pAmount": 6, "pSize": 12, "reload": 30, "speed": 12},
+        {"damage": 3, "range": 320, "pAmount": 6, "pSize": 12, "reload": 30, "speed": 12}, ],
     [ // shotgun
-        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 12, "reload": 30, "speed": 5},
-        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 15, "reload": 30, "speed": 5},
-        {"damage": 4, "range": 48, "pAmount": 3, "pSize": 20, "reload": 30, "speed": 5}, ],
+        {"damage": 4, "range": 96, "pAmount": 3, "pSize": 12, "reload": 30, "speed": 5},
+        {"damage": 4, "range": 96, "pAmount": 3, "pSize": 15, "reload": 30, "speed": 5},
+        {"damage": 4, "range": 96, "pAmount": 3, "pSize": 20, "reload": 30, "speed": 5}, ],
     [ // untitled2
-        {"damage": 4, "range": 60, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8},
-        {"damage": 4, "range": 80, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8},
-        {"damage": 4, "range": 100, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8}, ],
+        {"damage": 4, "range": 120, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8},
+        {"damage": 4, "range": 160, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8},
+        {"damage": 4, "range": 200, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8}, ],
 ];
 
 function Tower(sprite, point, type, rangeShape, addParticle) {
