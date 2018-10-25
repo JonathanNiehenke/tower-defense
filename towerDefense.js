@@ -21,7 +21,7 @@ function Game(bgCanvas, fgCanvas) {
     this.enemies = new Enemies(this.sprites["slime"],
         new HealthBar(this.fgContext), this.map.movement.bind(this.map));
     this.defense = new DefenseNetwork(this.sprites["towers"],
-        new Orb(this.fgContext), new IsoCircle(this.fgContext));
+        new Orb(this.fgContext), new Circle(this.fgContext));
     this.towerMenu = new TowerMenu(
         this.sprites["towers"], new Point(20, 380), new Point(30, 0), 27/3);
     this.init = function() {
