@@ -15,7 +15,7 @@ function Map(tiles, shape) {
     };
     this.draw = function() {
         for (const [point, val] of this.structure.iter())
-            this.tiles.draw(point.x * this.size, point.y * this.size, val);
+            this.tiles.draw(point, val);
     };
     this.highlightTileAt = function(gridPoint) {
         const iPoint = this.topOfTileAt(gridPoint);
@@ -94,8 +94,13 @@ function TileSet(sprite) {
     this.getHeight = function() {
         return this.sprite.height;
     };
-    this.draw = function(x, y, tileVal) {
-        this.sprite.draw(tileVal % 4, Math.floor(tileVal / 4), x, y);
+    this.draw = function(point, tileVal) {
+        const drawPos = this.toTile(point);
+        this.sprite.draw(
+            tileVal % 4, Math.floor(tileVal / 4), drawPos.x, drawPos.y);
+    };
+    this.toTile = function(point) {
+        return point.multi(this.sprite.width);
     };
     this.movement = function(tileVal, heading) {
         try { return this.tileMovement[tileVal](heading); }
@@ -104,6 +109,17 @@ function TileSet(sprite) {
             else if (this.tileMovement[tileVal] == undefined) throw "Off path";
             throw e;
         }
+    };
+    return this;
+}
+
+function IsoTileSet(sprite) {
+    this.__proto__ = new TileSet(sprite);
+    this.toTile = function(point) {
+        return this.convert(point.multi(this.sprite.width / 2));
+    };
+    this.convert = function(point) {
+        return new Point(point.x - point.y, (point.x + point.y) / 2);
     };
     return this;
 }
