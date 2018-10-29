@@ -39,6 +39,26 @@ function Rectangle(context) {
     return this;
 }
 
+function IsoRectangle(context) {
+    this.context = context;
+    this.draw = function(x, y, width, height, stroke, fill) {
+        this.path(x, y, width, height / 2);
+        context.strokeStyle = stroke;
+        context.fillStyle = fill;
+        context.stroke();
+        context.fill();
+    };
+    this.path = function(x, y, width, height) {
+        this.context.beginPath();
+        this.context.moveTo(x, y);
+        this.context.lineTo(x + width, y + height);
+        this.context.lineTo(x, y + width);
+        this.context.lineTo(x - width, y + height);
+        this.context.closePath();
+    };
+    return this;
+}
+
 function Circle(context) {
     this.context = context;
     this.draw = function(x, y, radius, _, stroke, fill) {

@@ -17,8 +17,8 @@ function Game(bgCanvas, fgCanvas) {
         "iroads": new Sprite(this.bgContext,  "sprites/IsoRoadSet_Kenney.png", 2, 4),
         "slime": new Sprite(this.fgContext, "sprites/SlimeIso.png", 4, 4),
     };
-    this.map = new Map(
-        new IsoTileSet(this.sprites["iroads"]), new Rectangle(this.fgContext));
+    this.map = new Map(new IsoTileSet(
+        this.sprites["iroads"], new IsoRectangle(this.fgContext)));
     this.enemies = new Enemies(this.sprites["slime"],
         new HealthBar(this.fgContext), this.map.movement.bind(this.map));
     this.defense = new DefenseNetwork(this.sprites["towers"],

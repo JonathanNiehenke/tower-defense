@@ -1,6 +1,5 @@
-function Map(tiles, shape) {
+function Map(tiles) {
     this.tiles = tiles;
-    this.shape = shape;
     this.size = this.tiles.getWidth();
     this.steps = 50;
     this.directions = {
@@ -17,10 +16,8 @@ function Map(tiles, shape) {
         for (const [point, val] of this.structure.iter())
             this.tiles.draw(point, val);
     };
-    this.highlightTileAt = function(gridPoint) {
-        const iPoint = this.topOfTileAt(gridPoint);
-        this.shape.draw(iPoint.x, iPoint.y, this.size, this.size,
-            "silver",  "rgba(255, 255, 255, 0.20)");
+    this.highlightTileAt = function(point) {
+        this.tiles.highlightAt(point);
     };
     this.movement = function(progress) {
         if (progress.traveled % this.steps < progress.speed)
@@ -76,8 +73,10 @@ function MapStructure() {
     this.return;
 }
 
-function TileSet(sprite) {
+function TileSet(sprite, highlight) {
     this.sprite = sprite;
+    this.highlight = highlight;
+    this.size = this.sprite.width;
     this.tileMovement = [
         undefined,
         undefined,
@@ -99,8 +98,16 @@ function TileSet(sprite) {
         this.sprite.draw(
             tileVal % 4, Math.floor(tileVal / 4), drawPos.x, drawPos.y);
     };
+    this.highlightAt = function(point) {
+        const drawPos = this.toTile(this.toGrid(point));
+        this.highlight.draw(drawPos.x, drawPos.y, this.size, this.size,
+            "silver",  "rgba(255, 255, 255, 0.20)");
+    };
+    this.toGrid = function(point) {
+        return point.div(this.size).floor();
+    };
     this.toTile = function(point) {
-        return point.multi(this.sprite.width);
+        return point.multi(this.size);
     };
     this.movement = function(tileVal, heading) {
         try { return this.tileMovement[tileVal](heading); }
@@ -113,13 +120,20 @@ function TileSet(sprite) {
     return this;
 }
 
-function IsoTileSet(sprite) {
-    this.__proto__ = new TileSet(sprite);
-    this.toTile = function(point) {
-        return this.convert(point.multi(this.sprite.width / 2));
+function IsoTileSet(sprite, highlight) {
+    this.__proto__ = new TileSet(sprite, highlight);
+    this.size = this.sprite.width / 2;
+    this.toGrid = function(point) {
+        return this.toCartesian(point).div(this.size).floor();
     };
-    this.convert = function(point) {
+    this.toTile = function(point) {
+        return this.toIsometric(point.multi(this.size));
+    };
+    this.toIsometric = function(point) {
         return new Point(point.x - point.y, (point.x + point.y) / 2);
+    };
+    this.toCartesian = function(point) {
+        return new Point(point.x / 2 + point.y, point.y - point.x / 2);
     };
     return this;
 }
