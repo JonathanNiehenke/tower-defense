@@ -123,6 +123,15 @@ function TileSet(sprite, highlight) {
 function IsoTileSet(sprite, highlight) {
     this.__proto__ = new TileSet(sprite, highlight);
     this.size = this.sprite.width / 2;
+    this.drawnDims = function([x, y]) {
+        this.offset.change(y * this.size, 0);
+    };
+    this.draw = function(point, tileVal) {
+        const drawPos = this.toTile(point);
+        this.sprite.draw(
+            tileVal % 4, Math.floor(tileVal / 4),
+            drawPos.x - this.size, drawPos.y);
+    };
     this.toGrid = function(point) {
         return this.toCartesian(point).div(this.size).floor();
     };
