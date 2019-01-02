@@ -105,3 +105,57 @@ function Orb(context) {
     return this;
 }
 
+function RoadOutline(context, width, height, stroke) {
+    this.context = context;
+    this.width = width;
+    this.height = height;
+    this.stroke = stroke;
+    this.draw = function(type, x, y) {
+        this.context.beginPath();
+        this.type[type](x, y);
+        this.context.strokeStyle = stroke;
+        this.context.stroke();
+    };
+   this.vPath = function(x, y) {
+        this.context.moveTo(x, y);
+        this.context.lineTo(x, y + this.height);
+        this.context.moveTo(x + this.width, y);
+        this.context.lineTo(x + this.width, y + this.height);
+    };
+    this.hPath = function(x, y) {
+        this.context.moveTo(x, y);
+        this.context.lineTo(x + this.width, y);
+        this.context.moveTo(x, y + this.height);
+        this.context.lineTo(x + this.width, y + this.height);
+    };
+    this.turn1Path = function(x, y) {
+        this.context.moveTo(x + this.width, y + this.height);
+        this.context.arc(x + this.width, y, this.width, Math.PI/2, Math.PI);
+    };
+    this.turn2Path = function(x, y) {
+        this.context.moveTo(x + this.width, y);
+        this.context.arc(x, y, this.width, 0, Math.PI/2);
+    };
+    this.turn3Path = function(x, y) {
+        this.context.moveTo(x, y + this.height);
+        this.context.arc(
+            x + this.width, y + this.height, this.width, Math.PI, Math.PI*1.5);
+    };
+    this.turn4Path = function(x, y) {
+        this.context.moveTo(x, y);
+        this.context.arc(
+            x, y + this.height, this.width, Math.PI*1.5, Math.PI*2);
+    };
+    this.type = [
+        (x, y) => {},
+        (x, y) => {},
+        this.vPath.bind(this),
+        this.hPath.bind(this),
+        this.turn1Path.bind(this),
+        this.turn2Path.bind(this),
+        this.turn3Path.bind(this),
+        this.turn4Path.bind(this),
+    ];
+     return this;
+}
+

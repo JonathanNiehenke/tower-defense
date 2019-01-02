@@ -15,7 +15,7 @@ function Map(tiles, shape) {
     };
     this.draw = function() {
         for (const [point, val] of this.structure.iter())
-            this.tiles.draw(point.x * this.size, point.y * this.size, val);
+            this.tiles.drawOutline(point.x * this.size, point.y * this.size, val);
     };
     this.highlightTileAt = function(gridPoint) {
         const iPoint = this.topOfTileAt(gridPoint);
@@ -78,6 +78,7 @@ function MapStructure() {
 
 function TileSet(sprite) {
     this.sprite = sprite;
+    this.outline = new RoadOutline(sprite.context, sprite.width, sprite.height, "black");
     this.tileMovement = [
         undefined,
         undefined,
@@ -96,6 +97,9 @@ function TileSet(sprite) {
     };
     this.draw = function(x, y, tileVal) {
         this.sprite.draw(tileVal % 4, Math.floor(tileVal / 4), x, y);
+    };
+    this.drawOutline = function(x, y, tileVal) {
+        this.outline.draw(tileVal, x, y);
     };
     this.movement = function(tileVal, heading) {
         try { return this.tileMovement[tileVal](heading); }
