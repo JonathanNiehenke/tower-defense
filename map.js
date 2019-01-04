@@ -56,6 +56,9 @@ function Map(tiles, shape) {
     this.gridPosAt = function(point) {
         return point.div(this.size).floor();
     };
+    this.dimensions = function dimensions() {
+        return this.structure.dimensions();
+    };
     return this;
 }
 
@@ -73,7 +76,10 @@ function MapStructure() {
         try { return this.structure[point.y][point.x]; }
         catch (_) { return undefined; }
     };
-    this.return;
+    this.dimensions = function() {
+        return [this.structure[0].length, this.structure.length];
+    }
+    return this;
 }
 
 function TileSet(sprite, outline) {
