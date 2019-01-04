@@ -15,7 +15,13 @@ function Map(tiles, shape) {
     };
     this.draw = function() {
         for (const [point, val] of this.structure.iter())
-            this.tiles.drawOutline(point.x * this.size, point.y * this.size, val, this.size);
+            this.tiles.draw(point.x * this.size, point.y * this.size, val);
+    };
+    this.drawMini = function(x, y, width, height) {
+        const dims = this.structure.dimensions();
+        const size = Math.floor(Math.max(width/dims[0], height/dims[1]));
+        for (const [point, val] of this.structure.iter())
+            this.tiles.drawOutline(x + point.x*size, y + point.y*size, val, size);
     };
     this.highlightTileAt = function(gridPoint) {
         const iPoint = this.topOfTileAt(gridPoint);

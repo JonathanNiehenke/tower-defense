@@ -40,6 +40,7 @@ function Game(bgCanvas, fgCanvas) {
         this.enemies.newWaves(levels[num].waves);
         this.bgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.map.draw();
+        this.map.drawMini(600, 250, 200, 200);
         this.animation = setInterval(this.loop.bind(this), 28);
     };
     this.loop = function() {
