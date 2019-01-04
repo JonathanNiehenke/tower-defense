@@ -76,9 +76,9 @@ function MapStructure() {
     this.return;
 }
 
-function TileSet(sprite) {
+function TileSet(sprite, outline) {
     this.sprite = sprite;
-    this.outline = new RoadOutline(sprite.context, sprite.width, sprite.height, "black");
+    this.outline = outline;
     this.tileMovement = [
         undefined,
         undefined,

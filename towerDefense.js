@@ -14,10 +14,12 @@ function Game(bgCanvas, fgCanvas) {
     this.sprites = {
         "towers": new Sprite(this.fgContext, "sprites/Towers.png", 27, 8),
         "roads": new Sprite(this.bgContext,  "sprites/RoadSet_Kenney.png", 2, 4),
+        "outline": new RoadOutline(this.bgContext, 64, 64, "black"),
         "slime": new Sprite(this.fgContext, "sprites/SlimeIso.png", 4, 4),
     };
     this.map = new Map(
-        new TileSet(this.sprites["roads"]), new Rectangle(this.fgContext));
+        new TileSet(this.sprites["roads"], this.sprites["outline"]),
+        new Rectangle(this.fgContext));
     this.enemies = new Enemies(this.sprites["slime"],
         new HealthBar(this.fgContext), this.map.movement.bind(this.map));
     this.defense = new DefenseNetwork(this.sprites["towers"],
