@@ -105,46 +105,44 @@ function Orb(context) {
     return this;
 }
 
-function RoadOutline(context, width, height, stroke) {
+function RoadOutline(context, stroke) {
     this.context = context;
-    this.width = width;
-    this.height = height;
     this.stroke = stroke;
-    this.draw = function(type, x, y) {
+    this.draw = function(type, x, y, size) {
         this.context.beginPath();
-        this.type[type](x, y);
+        this.type[type](x, y, size);
         this.context.strokeStyle = stroke;
         this.context.stroke();
     };
-   this.vPath = function(x, y) {
+   this.vPath = function(x, y, size) {
         this.context.moveTo(x, y);
-        this.context.lineTo(x, y + this.height);
-        this.context.moveTo(x + this.width, y);
-        this.context.lineTo(x + this.width, y + this.height);
+        this.context.lineTo(x, y + size);
+        this.context.moveTo(x + size, y);
+        this.context.lineTo(x + size, y + size);
     };
-    this.hPath = function(x, y) {
+    this.hPath = function(x, y, size) {
         this.context.moveTo(x, y);
-        this.context.lineTo(x + this.width, y);
-        this.context.moveTo(x, y + this.height);
-        this.context.lineTo(x + this.width, y + this.height);
+        this.context.lineTo(x + size, y);
+        this.context.moveTo(x, y + size);
+        this.context.lineTo(x + size, y + size);
     };
-    this.turn1Path = function(x, y) {
-        this.context.moveTo(x + this.width, y + this.height);
-        this.context.arc(x + this.width, y, this.width, Math.PI/2, Math.PI);
+    this.turn1Path = function(x, y, size) {
+        this.context.moveTo(x + size, y + size);
+        this.context.arc(x + size, y, size, Math.PI/2, Math.PI);
     };
-    this.turn2Path = function(x, y) {
-        this.context.moveTo(x + this.width, y);
-        this.context.arc(x, y, this.width, 0, Math.PI/2);
+    this.turn2Path = function(x, y, size) {
+        this.context.moveTo(x + size, y);
+        this.context.arc(x, y, size, 0, Math.PI/2);
     };
-    this.turn3Path = function(x, y) {
-        this.context.moveTo(x, y + this.height);
+    this.turn3Path = function(x, y, size) {
+        this.context.moveTo(x, y + size);
         this.context.arc(
-            x + this.width, y + this.height, this.width, Math.PI, Math.PI*1.5);
+            x + size, y + size, size, Math.PI, Math.PI*1.5);
     };
-    this.turn4Path = function(x, y) {
+    this.turn4Path = function(x, y, size) {
         this.context.moveTo(x, y);
         this.context.arc(
-            x, y + this.height, this.width, Math.PI*1.5, Math.PI*2);
+            x, y + size, size, Math.PI*1.5, Math.PI*2);
     };
     this.type = [
         (x, y) => {},
