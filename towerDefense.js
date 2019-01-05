@@ -20,8 +20,9 @@ function Game(bgCanvas, fgCanvas) {
     this.map = new Map(
         new TileSet(this.sprites["roads"], this.sprites["outline"]),
         new Rectangle(this.fgContext));
-    this.enemies = new Enemies(this.sprites["slime"],
-        new HealthBar(this.fgContext), this.map.movement.bind(this.map));
+    this.enemies = new Enemies(
+        this.sprites["slime"], new HealthBar(this.fgContext),
+        new Circle(this.fgContext), this.map.movement.bind(this.map));
     this.defense = new DefenseNetwork(this.sprites["towers"],
         new Orb(this.fgContext), new Circle(this.fgContext));
     this.towerMenu = new TowerMenu(
@@ -75,6 +76,7 @@ function Game(bgCanvas, fgCanvas) {
                 this.map.centerOfTileAt(this.mousePos));
         }
         this.enemies.draw();
+        this.enemies.drawMini(600, 250, this.map.dimensions()[0]/200);
         this.defense.draw();
         this.towerMenu.draw(this.mousePos);
     };

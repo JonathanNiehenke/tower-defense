@@ -1,4 +1,4 @@
-function Enemies(sprite, healthBarShape, mapMovement) {
+function Enemies(sprite, healthBarShape, circle, mapMovement) {
     this.sprite = sprite;
     this.healthBarShape = healthBarShape;
     this.mapMovement = mapMovement;
@@ -22,8 +22,8 @@ function Enemies(sprite, healthBarShape, mapMovement) {
     };
     this.createCreep = function() {
         if (this.isSpaced()) {
-            this.enemies.push(new Creep(this.sprite,
-                this.healthBarShape, this.mapMovement, this.currentWave));
+            this.enemies.push(new Creep(this.sprite, this.healthBarShape,
+            circle, this.mapMovement, this.currentWave));
             --this.currentWave.amount;
         }
     };
@@ -42,6 +42,10 @@ function Enemies(sprite, healthBarShape, mapMovement) {
         for (creep of this.enemies)
             creep.draw();
     };
+    this.drawMini = function(x, y, size=3) {
+        for (creep of this.enemies)
+            creep.drawMini(x, y, size);
+    };
     this.hit = function(withinRange, damageAmount) {
         let creep = this.enemies.find(creep => withinRange(creep.point(), 5));
         try { creep.damage(damageAmount); }
@@ -51,7 +55,7 @@ function Enemies(sprite, healthBarShape, mapMovement) {
     this.return;
 }
 
-function Creep(sprite, healthBarShape, mapMovement, waveAttributes) {
+function Creep(sprite, healthBarShape, circle, mapMovement, waveAttributes) {
     this.sprite = sprite;
     this.healthBarShape = healthBarShape;
     this.mapMovement = mapMovement;
@@ -84,6 +88,10 @@ function Creep(sprite, healthBarShape, mapMovement, waveAttributes) {
         const facing = this.facing[this.progress.heading];
         const drawPos = this.point().add(this.center.x, this.center.y).floor();
         this.sprite.draw(animation, facing, drawPos.x, drawPos.y);
+    };
+    this.drawMini = function(x, y, size) {
+        const drawPos = this.point().div(size).add(x, y);
+        circle.draw(drawPos.x, drawPos.y, 12/size, undefined, "black", "black");
     };
     this.point = function() {
         return this.progress.point;

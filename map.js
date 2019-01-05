@@ -63,7 +63,7 @@ function Map(tiles, shape) {
         return point.div(this.size).floor();
     };
     this.dimensions = function dimensions() {
-        return this.structure.dimensions();
+        return this.structure.dimensions().map(x => x * this.size);
     };
     return this;
 }
