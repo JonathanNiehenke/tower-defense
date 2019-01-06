@@ -17,11 +17,9 @@ function Map(tiles, shape) {
         for (const [point, val] of this.structure.iter())
             this.tiles.draw(point.x * this.size, point.y * this.size, val);
     };
-    this.drawMini = function(x, y, width, height) {
-        const dims = this.structure.dimensions();
-        const size = Math.floor(Math.max(width/dims[0], height/dims[1]));
+    this.drawMini = function(origin, size) {
         for (const [point, val] of this.structure.iter())
-            this.tiles.drawOutline(x + point.x*size, y + point.y*size, val, size);
+            this.tiles.drawOutline(origin.x + point.x*size, origin.y + point.y*size, val, size);
     };
     this.highlightTileAt = function(gridPoint) {
         const iPoint = this.topOfTileAt(gridPoint);

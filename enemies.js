@@ -42,9 +42,9 @@ function Enemies(sprite, healthBarShape, circle, mapMovement) {
         for (creep of this.enemies)
             creep.draw();
     };
-    this.drawMini = function(x, y, size=3) {
+    this.drawMini = function(origin, size) {
         for (creep of this.enemies)
-            creep.drawMini(x, y, size);
+            creep.drawMini(origin.x, origin.y, size);
     };
     this.hit = function(withinRange, damageAmount) {
         let creep = this.enemies.find(creep => withinRange(creep.point(), 5));

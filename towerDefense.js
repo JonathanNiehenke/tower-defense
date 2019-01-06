@@ -27,6 +27,8 @@ function Game(bgCanvas, fgCanvas) {
         new Orb(this.fgContext), new Circle(this.fgContext));
     this.towerMenu = new TowerMenu(
         this.sprites["towers"], new Point(20, 380), new Point(30, 0), 27/3);
+    this.minimap = new MiniMap(
+        new Point(600, 250), new Point(200, 200), this.map, this.enemies);
     this.init = function() {
         this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
         this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
@@ -41,7 +43,8 @@ function Game(bgCanvas, fgCanvas) {
         this.enemies.newWaves(levels[num].waves);
         this.bgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.map.draw();
-        this.map.drawMini(600, 250, 200, 200);
+        this.minimap.update();
+        this.minimap.mapDraw();
         this.animation = setInterval(this.loop.bind(this), 28);
     };
     this.loop = function() {
@@ -76,7 +79,7 @@ function Game(bgCanvas, fgCanvas) {
                 this.map.centerOfTileAt(this.mousePos));
         }
         this.enemies.draw();
-        this.enemies.drawMini(600, 250, this.map.dimensions()[0]/200);
+        this.minimap.enemyDraw();
         this.defense.draw();
         this.towerMenu.draw(this.mousePos);
     };
@@ -103,3 +106,19 @@ function Game(bgCanvas, fgCanvas) {
     return this;
 }
 
+function MiniMap(origin, dims, map, enemies) {
+    this.origin = origin;
+    this.dims = dims;
+    this.size = undefined;
+    this.update = function() {
+        const mapDims = map.dimensions();
+        this.size = Math.max(mapDims[0]/dims.x, mapDims[1]/dims.y);
+    };
+    this.mapDraw = function() {
+        map.drawMini(this.origin, map.size/this.size);
+    };
+    this.enemyDraw = function() {
+        enemies.drawMini(this.origin, this.size);
+    };
+    return this;
+}
