@@ -1,11 +1,11 @@
-function TowerMenu(sprite, origin, spacing, displayNum) {
-    this.menu = new Menu(sprite, origin, spacing);
+function TowerMenu(origin, spacing, sprite, displayNum) {
+    this.menu = new Menu(origin, spacing, sprite);
     this.displayNum = displayNum;
     this.dragged = undefined;
     this.draw = function(mousePos) {
         this.drawDrag(mousePos);
         for (let i = 0; i < this.displayNum; ++i)
-            this.menu.draw(0, i*3, i, 0);
+            this.menu.draw(i, 0, 0, i*3);
     };
     this.drawDrag = function(mousePos) {
         if (this.dragged === undefined) return;
@@ -36,12 +36,12 @@ function TowerMenu(sprite, origin, spacing, displayNum) {
     return this;
 }
 
-function Menu(sprite, origin, spacing) {
-    this.sprite = sprite;
+function Menu(origin, spacing, sprite) {
     this.origin = origin;
     this.cellWidth = sprite.width + spacing.x;
     this.cellHeight = sprite.height + spacing.y;
-    this.draw = function(sheetX, sheetY, menuX, menuY) {
+    this.sprite = sprite;
+    this.draw = function(menuX, menuY, sheetX, sheetY) {
         const drawPos = this.origin.add(
             menuX * this.cellWidth, menuY * this.cellHeight);
         this.sprite.draw(drawPos.x, drawPos.y, sheetX, sheetY);

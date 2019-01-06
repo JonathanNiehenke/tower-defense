@@ -26,7 +26,7 @@ function Game(bgCanvas, fgCanvas) {
     this.defense = new DefenseNetwork(this.sprites["towers"],
         new Orb(this.fgContext), new Circle(this.fgContext));
     this.towerMenu = new TowerMenu(
-        this.sprites["towers"], new Point(20, 380), new Point(30, 0), 27/3);
+        new Point(20, 380), new Point(30, 0), this.sprites["towers"], 27/3);
     this.minimap = new MiniMap(
         new Point(600, 250), new Point(200, 200), this.map, this.enemies);
     this.init = function() {
