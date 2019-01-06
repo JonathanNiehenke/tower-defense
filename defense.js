@@ -85,7 +85,7 @@ function Tower(sprite, point, type, rangeShape, addParticle) {
     this.draw = function() {
         let drawPos = this.point.sub(this.centerFeet.x, this.centerFeet.y);
         this.sprite.draw(
-            this.col, this.type + this.level, drawPos.x, drawPos.y);
+            drawPos.x, drawPos.y, this.col, this.type + this.level);
     };
     this.highlightRange = function() {
         rangeShape.draw(

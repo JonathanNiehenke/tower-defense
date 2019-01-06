@@ -9,7 +9,7 @@ function Sprite(context, imgSheet, imgRows, imgCols) {
     this.img = loadImage(imgSheet);
     this.width = this.img.width / imgCols;
     this.height = this.img.height / imgRows;
-    this.draw = function(col, row, x, y) {
+    this.draw = function(x, y, col, row) {
         col = (col * this.width) % this.img.width;
         row = row * this.height;
         this.context.drawImage(this.img,
@@ -108,7 +108,7 @@ function Orb(context) {
 function RoadOutline(context, stroke) {
     this.context = context;
     this.stroke = stroke;
-    this.draw = function(type, x, y, size) {
+    this.draw = function(x, y, type, size) {
         this.context.beginPath();
         this.type[type](x, y, size);
         this.context.strokeStyle = stroke;

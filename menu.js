@@ -10,7 +10,7 @@ function TowerMenu(sprite, origin, spacing, displayNum) {
     this.drawDrag = function(mousePos) {
         if (this.dragged === undefined) return;
         const drawPos = mousePos.sub(this.dragged.pos.x, this.dragged.pos.y);
-        sprite.draw(0, this.dragged.value * 3, drawPos.x, drawPos.y);
+        sprite.draw(drawPos.x, drawPos.y, 0, this.dragged.value * 3);
     };
     this.mouseDown = function(mousePos) {
         const diff = mousePos.sub(origin.x, origin.y);
@@ -44,7 +44,7 @@ function Menu(sprite, origin, spacing) {
     this.draw = function(sheetX, sheetY, menuX, menuY) {
         const drawPos = this.origin.add(
             menuX * this.cellWidth, menuY * this.cellHeight);
-        this.sprite.draw(sheetX, sheetY, drawPos.x, drawPos.y);
+        this.sprite.draw(drawPos.x, drawPos.y, sheetX, sheetY);
     };
     return this;
 }

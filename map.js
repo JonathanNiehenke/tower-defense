@@ -106,10 +106,10 @@ function TileSet(sprite, outline) {
         return this.sprite.height;
     };
     this.draw = function(x, y, tileVal) {
-        this.sprite.draw(tileVal % 4, Math.floor(tileVal / 4), x, y);
+        this.sprite.draw(x, y, tileVal % 4, Math.floor(tileVal / 4));
     };
     this.drawOutline = function(x, y, tileVal, size=64) {
-        this.outline.draw(tileVal, x, y, size);
+        this.outline.draw(x, y, tileVal, size);
     };
     this.movement = function(tileVal, heading) {
         try { return this.tileMovement[tileVal](heading); }

@@ -87,7 +87,7 @@ function Creep(sprite, healthBarShape, circle, mapMovement, waveAttributes) {
         const animation = Math.floor(this.progress.traveled / 5);
         const facing = this.facing[this.progress.heading];
         const drawPos = this.point().add(this.center.x, this.center.y).floor();
-        this.sprite.draw(animation, facing, drawPos.x, drawPos.y);
+        this.sprite.draw(drawPos.x, drawPos.y, animation, facing);
     };
     this.drawMini = function(x, y, size) {
         const drawPos = this.point().div(size).add(x, y);
