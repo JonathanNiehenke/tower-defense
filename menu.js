@@ -42,10 +42,10 @@ function Menu(origin, cellDims, drawable) {
     this.origin = origin;
     this.cellDims = cellDims;
     this.drawable = drawable;
-    this.draw = function(menuX, menuY, sheetX, sheetY) {
+    this.draw = function(menuX, menuY, ...args) {
         const drawPos = this.origin.add(
             menuX * this.cellDims.x, menuY * this.cellDims.y);
-        this.sprite.draw(drawPos.x, drawPos.y, sheetX, sheetY);
+        this.drawable.draw(drawPos.x, drawPos.y, ...args);
     };
     return this;
 }
