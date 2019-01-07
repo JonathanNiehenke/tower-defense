@@ -43,7 +43,6 @@ function Game(bgCanvas, fgCanvas) {
         this.enemies.newWaves(levels[num].waves);
         this.bgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.map.draw();
-        this.minimap.update();
         this.minimap.mapDraw();
         this.animation = setInterval(this.loop.bind(this), 28);
     };
@@ -111,16 +110,11 @@ function MiniMap(origin, dims, map, enemies, viewShape) {
     this.origin = origin;
     this.dims = dims;
     this.viewPort = new Menu(origin, dims.multi(3/7), viewShape);
-    this.size = undefined;
-    this.update = function() {
-        const mapDims = map.dimensions();
-        this.size = Math.max(mapDims[0]/dims.x, mapDims[1]/dims.y);
-    };
     this.mapDraw = function() {
-        map.drawMini(this.origin, map.size/this.size);
+        map.drawMini(this.origin, this.dims);
     };
     this.enemyDraw = function() {
-        enemies.drawMini(this.origin, this.size);
+        enemies.drawMini(this.origin, map.dimensions().x / dims.x);
     };
     this.viewDraw = function() {
         this.viewPort.draw(0, 1, dims.x*3/7, dims.y*3/7, "black", "rgba(255, 255, 255, 0.375");

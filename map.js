@@ -17,9 +17,13 @@ function Map(tiles, shape) {
         for (const [point, val] of this.structure.iter())
             this.tiles.draw(point.x * this.size, point.y * this.size, val);
     };
-    this.drawMini = function(origin, size) {
-        for (const [point, val] of this.structure.iter())
-            this.tiles.drawOutline(origin.x + point.x*size, origin.y + point.y*size, val, size);
+    this.drawMini = function(origin, dims) {
+        const sDims = this.structure.dimensions();
+        const size  = new Point(dims.x / sDims.x, dims.y / sDims.y);
+        for (const [point, val] of this.structure.iter()) {
+            this.tiles.drawOutline(
+                origin.x + point.x*size.x, origin.y + point.y*size.y, val, size.x);
+        }
     };
     this.highlightTileAt = function(gridPoint) {
         const iPoint = this.topOfTileAt(gridPoint);
@@ -61,7 +65,7 @@ function Map(tiles, shape) {
         return point.div(this.size).floor();
     };
     this.dimensions = function dimensions() {
-        return this.structure.dimensions().map(x => x * this.size);
+        return this.structure.dimensions().multi(this.size);
     };
     return this;
 }
@@ -81,8 +85,8 @@ function MapStructure() {
         catch (_) { return undefined; }
     };
     this.dimensions = function() {
-        return [this.structure[0].length, this.structure.length];
-    }
+        return new Point(this.structure[0].length, this.structure.length);
+    };
     return this;
 }
 
