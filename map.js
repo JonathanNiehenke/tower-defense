@@ -13,8 +13,8 @@ function Map(tiles, shape) {
     this.applyLevel = function(structure) {
         this.structure.new(structure);
     };
-    this.draw = function() {
-        for (const [point, val] of this.structure.iter())
+    this.draw = function(from=undefined, to=undefined) {
+        for (const [point, val] of this.structure.iter(from, to))
             this.tiles.draw(point.x * this.size, point.y * this.size, val);
     };
     this.drawMini = function(origin, dims) {
@@ -75,9 +75,11 @@ function MapStructure() {
     this.new = function(structure) {
         this.structure = structure;
     };
-    this.iter = function*() {
-        for (const [y, row] of this.structure.entries())
-            for (const [x, val] of row.entries())
+    this.iter = function*(from=undefined, to=undefined) {
+        from = from === undefined ? new Point(0, 0) : from;
+        to = to === undefined ? this.dimensions() : to;
+        for (const [y, row] of this.structure.slice(from.y, to.y+1).entries())
+            for (const [x, val] of row.slice(from.x, to.x+1).entries())
                 yield [new Point(x, y), val];
     };
     this.value = function(point) {
