@@ -1,6 +1,8 @@
 function TowerMenu(origin, spacing, sprite, displayNum) {
-    this.menu = new Menu(origin, spacing, sprite);
     this.displayNum = displayNum;
+    this.cellDims = new Point(
+        sprite.width + spacing.x, sprite.height + spacing.y);
+    this.menu = new Menu(origin, this.cellDims, sprite);
     this.dragged = undefined;
     this.draw = function(mousePos) {
         this.drawDrag(mousePos);
@@ -14,10 +16,10 @@ function TowerMenu(origin, spacing, sprite, displayNum) {
     };
     this.mouseDown = function(mousePos) {
         const diff = mousePos.sub(origin.x, origin.y);
-        const cell = diff.div(
-            this.menu.cellWidth, this.menu.cellHeight).floor();
+        const cell = new Point(
+            diff.x / this.cellDims.x, diff.y / this.cellDims.y).floor();
         const pos = new Point(
-            diff.x % this.menu.cellWidth, diff.y % this.menu.cellHeight);
+            diff.x % this.cellDims.x, diff.y % this.cellDims.y);
         if (this.withinMenu(cell) && this.onSprite(pos))
             this.dragged = {"value": cell.x, "pos": pos};
     };
@@ -36,14 +38,13 @@ function TowerMenu(origin, spacing, sprite, displayNum) {
     return this;
 }
 
-function Menu(origin, spacing, sprite) {
+function Menu(origin, cellDims, drawable) {
     this.origin = origin;
-    this.cellWidth = sprite.width + spacing.x;
-    this.cellHeight = sprite.height + spacing.y;
-    this.sprite = sprite;
+    this.cellDims = cellDims;
+    this.drawable = drawable;
     this.draw = function(menuX, menuY, sheetX, sheetY) {
         const drawPos = this.origin.add(
-            menuX * this.cellWidth, menuY * this.cellHeight);
+            menuX * this.cellDims.x, menuY * this.cellDims.y);
         this.sprite.draw(drawPos.x, drawPos.y, sheetX, sheetY);
     };
     return this;
