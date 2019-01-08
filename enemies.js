@@ -36,12 +36,12 @@ function Enemies(sprite, healthBarShape, circle, mapMovement) {
         for (enemy of this.enemies)
             yield enemy.point();
     };
-    this.draw = function(condition=undefined) {
+    this.draw = function(condition=undefined, offset=undefined) {
         for (creep of this.enemies) {
             if (condition !== undefined && !condition(creep.progress.point))
                 continue;
-            creep.drawHealth(this.currentWave.health);
-            creep.draw();
+            creep.drawHealth(this.currentWave.health, offset);
+            creep.draw(offset);
         }
     };
     this.drawMini = function(origin, size) {
@@ -80,16 +80,22 @@ function Creep(sprite, healthBarShape, circle, mapMovement, waveAttributes) {
         else
             throw error;
     };
-    this.drawHealth = function(initHealth) {
-        const drawPos = this.point().add(this.center.x, this.center.y).floor();
+    this.drawHealth = function(initHealth, offset=undefined) {
+        const drawPos = this.drawPos(offset);
         this.healthBarShape.draw(drawPos.x, drawPos.y + this.sprite.height,
             this.sprite.width, 5, "Black", this.health/initHealth);
     };
-    this.draw = function() {
+    this.draw = function(offset=undefined) {
+        const drawPos = this.drawPos(offset);
         const animation = Math.floor(this.progress.traveled / 5);
         const facing = this.facing[this.progress.heading];
-        const drawPos = this.point().add(this.center.x, this.center.y).floor();
         this.sprite.draw(drawPos.x, drawPos.y, animation, facing);
+    };
+    this.drawPos = function(offset=undefined) {
+        let drawPos = this.point().add(this.center.x, this.center.y).floor();
+        if (offset === undefined)
+            return drawPos;
+        return offset(drawPos);
     };
     this.drawMini = function(x, y, size) {
         const drawPos = this.point().div(size).add(x, y);

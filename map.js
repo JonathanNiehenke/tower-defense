@@ -3,7 +3,7 @@ function Map(tiles, shape) {
     this.shape = shape;
     this.size = this.tiles.getWidth();
     this.steps = 50;
-    this.slice = {"from": undefined, "to": undefined};
+    this.slice = {"from": undefined, "to": undefined, "offset": undefined};
     this.directions = {
         "N": (new Point(0, -this.size / this.steps)),
         "S": (new Point(0, this.size / this.steps)),
@@ -16,6 +16,7 @@ function Map(tiles, shape) {
     };
     this.drawSlice = function(from, to) {
         this.slice.from = from, this.slice.to = to;
+        this.slice.offset = from.multi(this.size);
         for (const [point, val] of this.structure.sliceIter(from, to))
             this.tiles.draw(point.x * this.size, point.y * this.size, val);
     };
@@ -81,6 +82,9 @@ function Map(tiles, shape) {
             gridPoint.x >= this.slice.from.x &&
             this.slice.to.y > gridPoint.y &&
             gridPoint.y >= this.slice.from.y);
+    };
+    this.alignToSlice = function(point) {
+        return point.sub(this.slice.offset.x, this.slice.offset.y);
     };
     return this;
 }
