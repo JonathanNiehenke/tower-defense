@@ -3,6 +3,7 @@ function Map(tiles, shape) {
     this.shape = shape;
     this.size = this.tiles.getWidth();
     this.steps = 50;
+    this.slice = {"from": undefined, "to": undefined};
     this.directions = {
         "N": (new Point(0, -this.size / this.steps)),
         "S": (new Point(0, this.size / this.steps)),
@@ -13,8 +14,13 @@ function Map(tiles, shape) {
     this.applyLevel = function(structure) {
         this.structure.new(structure);
     };
-    this.draw = function(from=undefined, to=undefined) {
-        for (const [point, val] of this.structure.iter(from, to))
+    this.drawSlice = function(from, to) {
+        this.slice.from = from, this.slice.to = to;
+        for (const [point, val] of this.structure.sliceIter(from, to))
+            this.tiles.draw(point.x * this.size, point.y * this.size, val);
+    };
+    this.draw = function() {
+        for (const [point, val] of this.structure.iter())
             this.tiles.draw(point.x * this.size, point.y * this.size, val);
     };
     this.drawMini = function(origin, dims) {
@@ -75,13 +81,16 @@ function MapStructure() {
     this.new = function(structure) {
         this.structure = structure;
     };
-    this.iter = function*(from=undefined, to=undefined) {
-        from = from === undefined ? new Point(0, 0) : from;
-        to = to === undefined ? this.dimensions() : to;
-        for (const [y, row] of this.structure.slice(from.y, to.y+1).entries())
-            for (const [x, val] of row.slice(from.x, to.x+1).entries())
+    this.iter = function*() {
+        for (const [y, row] of this.structure.entries())
+            for (const [x, val] of row.entries())
                 yield [new Point(x, y), val];
     };
+    this.sliceIter = function*(from, to) {
+        for (const [y, row] of this.structure.slice(from.y, to.y).entries())
+            for (const [x, val] of row.slice(from.x, to.x).entries())
+                yield [new Point(x, y), val];
+    }
     this.value = function(point) {
         try { return this.structure[point.y][point.x]; }
         catch (_) { return undefined; }

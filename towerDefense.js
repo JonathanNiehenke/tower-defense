@@ -42,7 +42,7 @@ function Game(bgCanvas, fgCanvas) {
             wave => wave.start = this.map.startPos(wave.start));
         this.enemies.newWaves(levels[num].waves);
         this.bgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.map.draw(new Point(3, 3), new Point(6, 6));
+        this.map.drawSlice(new Point(3, 3), new Point(6, 6));
         this.minimap.mapDraw();
         this.animation = setInterval(this.loop.bind(this), 28);
     };
