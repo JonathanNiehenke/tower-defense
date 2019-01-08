@@ -73,6 +73,15 @@ function Map(tiles, shape) {
     this.dimensions = function dimensions() {
         return this.structure.dimensions().multi(this.size);
     };
+    this.sliceView = function(point) {
+        return this.isWithinSlice(this.gridPosAt(point));
+    };
+    this.isWithinSlice = function(gridPoint) {
+        return (this.slice.to.x > gridPoint.x &&
+            gridPoint.x >= this.slice.from.x &&
+            this.slice.to.y > gridPoint.y &&
+            gridPoint.y >= this.slice.from.y);
+    };
     return this;
 }
 

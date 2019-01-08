@@ -36,11 +36,13 @@ function Enemies(sprite, healthBarShape, circle, mapMovement) {
         for (enemy of this.enemies)
             yield enemy.point();
     };
-    this.draw = function() {
-        for (creep of this.enemies)
+    this.draw = function(condition=undefined) {
+        for (creep of this.enemies) {
+            if (condition !== undefined && !condition(creep.progress.point))
+                continue;
             creep.drawHealth(this.currentWave.health);
-        for (creep of this.enemies)
             creep.draw();
+        }
     };
     this.drawMini = function(origin, size) {
         for (creep of this.enemies)

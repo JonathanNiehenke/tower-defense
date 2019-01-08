@@ -77,7 +77,7 @@ function Game(bgCanvas, fgCanvas) {
             this.defense.highlightRangeAt(
                 this.map.centerOfTileAt(this.mousePos));
         }
-        this.enemies.draw();
+        this.enemies.draw(this.map.sliceView.bind(this.map));
         this.minimap.enemyDraw();
         this.minimap.viewDraw();
         this.defense.draw();
