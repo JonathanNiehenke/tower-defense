@@ -42,7 +42,8 @@ function Game(bgCanvas, fgCanvas) {
             wave => wave.start = this.map.startPos(wave.start));
         this.enemies.newWaves(levels[num].waves);
         this.bgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.map.drawSlice(new Point(3, 3), new Point(6, 6));
+        this.minimap.mapSlice();
+        this.map.drawSlice();
         this.minimap.mapDraw();
         this.animation = setInterval(this.loop.bind(this), 28);
     };
@@ -110,6 +111,9 @@ function MiniMap(origin, dims, map, enemies, viewShape) {
     this.origin = origin;
     this.dims = dims;
     this.viewPort = new Menu(origin, dims.multi(3/7), viewShape);
+    this.mapSlice = function() {
+        map.applySlice(new Point(3, 3), new Point(6, 6));
+    };
     this.mapDraw = function() {
         map.drawMini(this.origin, this.dims);
     };
@@ -117,7 +121,7 @@ function MiniMap(origin, dims, map, enemies, viewShape) {
         enemies.drawMini(this.origin, map.dimensions().x / dims.x);
     };
     this.viewDraw = function() {
-        this.viewPort.draw(0, 1, dims.x*3/7, dims.y*3/7, "black", "rgba(255, 255, 255, 0.375");
+        this.viewPort.draw(0, 1, dims.x*3/6, dims.y*3/6, "black", "rgba(255, 255, 255, 0.375");
     };
     return this;
 }

@@ -14,10 +14,12 @@ function Map(tiles, shape) {
     this.applyLevel = function(structure) {
         this.structure.new(structure);
     };
-    this.drawSlice = function(from, to) {
+    this.applySlice = function(from, to) {
         this.slice.from = from, this.slice.to = to;
         this.slice.offset = from.multi(this.size);
-        for (const [point, val] of this.structure.sliceIter(from, to))
+    };
+    this.drawSlice = function() {
+        for (const [point, val] of this.structure.sliceIter(this.slice))
             this.tiles.draw(point.x * this.size, point.y * this.size, val);
     };
     this.draw = function() {
@@ -99,7 +101,7 @@ function MapStructure() {
             for (const [x, val] of row.entries())
                 yield [new Point(x, y), val];
     };
-    this.sliceIter = function*(from, to) {
+    this.sliceIter = function*({from, to}) {
         for (const [y, row] of this.structure.slice(from.y, to.y).entries())
             for (const [x, val] of row.slice(from.x, to.x).entries())
                 yield [new Point(x, y), val];
