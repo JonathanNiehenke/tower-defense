@@ -14,17 +14,19 @@ function Map(tiles, shape) {
     this.applyLevel = function(structure) {
         this.structure.new(structure);
     };
-    this.applySlice = function(from, to) {
-        this.slice.from = from, this.slice.to = to;
-        this.slice.offset = from.multi(this.size);
+    this.draw = function() {
+        for (const [point, val] of this.structure.iter())
+            this.tiles.draw(point.x * this.size, point.y * this.size, val);
     };
     this.drawSlice = function() {
         for (const [point, val] of this.structure.sliceIter(this.slice))
             this.tiles.draw(point.x * this.size, point.y * this.size, val);
     };
-    this.draw = function() {
-        for (const [point, val] of this.structure.iter())
-            this.tiles.draw(point.x * this.size, point.y * this.size, val);
+    this.divisionSlice = function(div, point) {
+        const sliceDims = this.structure.dimensions().div(div);
+        this.slice.from = new Point(point.x * sliceDims.x, point.y * sliceDims.y);
+        this.slice.to = this.slice.from.add(sliceDims.x, sliceDims.y);
+        this.slice.offset = this.slice.from.multi(this.size);
     };
     this.drawMini = function(origin, dims) {
         const sDims = this.structure.dimensions();

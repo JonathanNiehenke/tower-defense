@@ -28,7 +28,7 @@ function Game(bgCanvas, fgCanvas) {
     this.towerMenu = new TowerMenu(
         new Point(20, 380), new Point(30, 0), this.sprites["towers"], 27/3);
     this.minimap = new MiniMap(new Point(600, 250), new Point(200, 200),
-        this.map, this.enemies, new Rectangle(this.fgContext));
+        2, this.map, this.enemies, new Rectangle(this.fgContext));
     this.init = function() {
         this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
         this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
@@ -107,12 +107,14 @@ function Game(bgCanvas, fgCanvas) {
     return this;
 }
 
-function MiniMap(origin, dims, map, enemies, viewShape) {
+function MiniMap(origin, dims, sqrDivisions, map, enemies, viewShape) {
     this.origin = origin;
     this.dims = dims;
-    this.viewPort = new Menu(origin, dims.multi(3/7), viewShape);
+    this.viewPos = new Point(1, 1);
+    this.viewDims = dims.div(sqrDivisions);
+    this.viewPort = new Menu(this.origin, this.viewDims, viewShape);
     this.mapSlice = function() {
-        map.applySlice(new Point(3, 3), new Point(6, 6));
+        map.divisionSlice(sqrDivisions, this.viewPos);
     };
     this.mapDraw = function() {
         map.drawMini(this.origin, this.dims);
@@ -121,7 +123,8 @@ function MiniMap(origin, dims, map, enemies, viewShape) {
         enemies.drawMini(this.origin, map.dimensions().x / dims.x);
     };
     this.viewDraw = function() {
-        this.viewPort.draw(0, 1, dims.x*3/6, dims.y*3/6, "black", "rgba(255, 255, 255, 0.375");
+        this.viewPort.draw(this.viewPos.x, this.viewPos.y,this.viewDims.x,
+            this.viewDims.y, "black", "rgba(255, 255, 255, 0.375");
     };
     return this;
 }
