@@ -42,9 +42,8 @@ function Game(bgCanvas, fgCanvas) {
             wave => wave.start = this.map.startPos(wave.start));
         this.enemies.newWaves(levels[num].waves);
         this.bgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.minimap.mapSlice();
-        this.map.drawSlice();
         this.minimap.mapDraw();
+        this.minimap.slice(new Point(0, 0));
         this.animation = setInterval(this.loop.bind(this), 28);
     };
     this.loop = function() {
@@ -92,6 +91,7 @@ function Game(bgCanvas, fgCanvas) {
         if (this.map.isMap(this.mousePos))
             this.defense.upgradeAt(this.map.centerOfTileAt(this.mousePos));
         this.towerMenu.mouseDown(this.mousePos);
+        this.minimap.mouseDown(this.mousePos);
     };
     this.mouseUp = function() {
         const type = this.towerMenu.mouseUpValue();
@@ -110,12 +110,9 @@ function Game(bgCanvas, fgCanvas) {
 function MiniMap(origin, dims, sqrDivisions, map, enemies, viewShape) {
     this.origin = origin;
     this.dims = dims;
-    this.viewPos = new Point(1, 1);
+    this.slicePos = undefined;
     this.viewDims = dims.div(sqrDivisions);
     this.viewPort = new Menu(this.origin, this.viewDims, viewShape);
-    this.mapSlice = function() {
-        map.divisionSlice(sqrDivisions, this.viewPos);
-    };
     this.mapDraw = function() {
         map.drawMini(this.origin, this.dims);
     };
@@ -123,8 +120,17 @@ function MiniMap(origin, dims, sqrDivisions, map, enemies, viewShape) {
         enemies.drawMini(this.origin, map.dimensions().x / dims.x);
     };
     this.viewDraw = function() {
-        this.viewPort.draw(this.viewPos.x, this.viewPos.y,this.viewDims.x,
+        this.viewPort.draw(this.slicePos.x, this.slicePos.y, this.viewDims.x,
             this.viewDims.y, "black", "rgba(255, 255, 255, 0.375");
+    };
+    this.mouseDown = function(mousePos) {
+        this.viewPort.mouseAction(mousePos, this.slice.bind(this))
+    };
+    this.slice = function(cell, _) {
+        if (cell.x >= 0 && cell.y >= 0) {
+            map.divisionSlice(sqrDivisions, this.slicePos = cell);
+            map.drawSlice();
+        }
     };
     return this;
 }
