@@ -1,9 +1,34 @@
+function MapSlice(tiles, shape) {
+    Map.call(this, tiles, shape);
+    this.slice = {"from": undefined, "to": undefined, "offset": undefined};
+    this.draw = function() {
+        for (const [point, val] of this.structure.sliceIter(this.slice))
+            this.tiles.draw(point.x * this.size, point.y * this.size, val);
+    };
+    this.divide = function(div, point) {
+        const sliceDims = this.structure.dimensions().div(div);
+        this.slice.from = new Point(point.x * sliceDims.x, point.y * sliceDims.y);
+        this.slice.to = this.slice.from.add(sliceDims.x, sliceDims.y);
+        this.slice.offset = this.slice.from.multi(this.size);
+    };
+    this.isWithinSlice = function(point) {
+        const gridPoint = this.gridPosAt(point);
+        return (this.slice.to.x > gridPoint.x &&
+            gridPoint.x >= this.slice.from.x &&
+            this.slice.to.y > gridPoint.y &&
+            gridPoint.y >= this.slice.from.y);
+    };
+    this.alignToSlice = function(point) {
+        return point.sub(this.slice.offset.x, this.slice.offset.y);
+    };
+    return this;
+}
+
 function Map(tiles, shape) {
     this.tiles = tiles;
     this.shape = shape;
     this.size = this.tiles.getWidth();
     this.steps = 50;
-    this.slice = {"from": undefined, "to": undefined, "offset": undefined};
     this.directions = {
         "N": (new Point(0, -this.size / this.steps)),
         "S": (new Point(0, this.size / this.steps)),
@@ -17,16 +42,6 @@ function Map(tiles, shape) {
     this.draw = function() {
         for (const [point, val] of this.structure.iter())
             this.tiles.draw(point.x * this.size, point.y * this.size, val);
-    };
-    this.drawSlice = function() {
-        for (const [point, val] of this.structure.sliceIter(this.slice))
-            this.tiles.draw(point.x * this.size, point.y * this.size, val);
-    };
-    this.divisionSlice = function(div, point) {
-        const sliceDims = this.structure.dimensions().div(div);
-        this.slice.from = new Point(point.x * sliceDims.x, point.y * sliceDims.y);
-        this.slice.to = this.slice.from.add(sliceDims.x, sliceDims.y);
-        this.slice.offset = this.slice.from.multi(this.size);
     };
     this.drawMini = function(origin, dims) {
         const sDims = this.structure.dimensions();
@@ -77,18 +92,6 @@ function Map(tiles, shape) {
     };
     this.dimensions = function dimensions() {
         return this.structure.dimensions().multi(this.size);
-    };
-    this.sliceView = function(point) {
-        return this.isWithinSlice(this.gridPosAt(point));
-    };
-    this.isWithinSlice = function(gridPoint) {
-        return (this.slice.to.x > gridPoint.x &&
-            gridPoint.x >= this.slice.from.x &&
-            this.slice.to.y > gridPoint.y &&
-            gridPoint.y >= this.slice.from.y);
-    };
-    this.alignToSlice = function(point) {
-        return point.sub(this.slice.offset.x, this.slice.offset.y);
     };
     return this;
 }

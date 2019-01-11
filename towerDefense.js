@@ -17,7 +17,7 @@ function Game(bgCanvas, fgCanvas) {
         "outline": new RoadOutline(this.bgContext, 64, 64, "black"),
         "slime": new Sprite(this.fgContext, "sprites/SlimeIso.png", 4, 4),
     };
-    this.map = new Map(
+    this.map = new MapSlice(
         new TileSet(this.sprites["roads"], this.sprites["outline"]),
         new Rectangle(this.fgContext));
     this.enemies = new Enemies(
@@ -42,8 +42,9 @@ function Game(bgCanvas, fgCanvas) {
             wave => wave.start = this.map.startPos(wave.start));
         this.enemies.newWaves(levels[num].waves);
         this.bgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.minimap.mapDraw();
         this.minimap.slice(new Point(0, 0));
+        this.map.draw();
+        this.minimap.mapDraw();
         this.animation = setInterval(this.loop.bind(this), 28);
     };
     this.loop = function() {
@@ -77,7 +78,9 @@ function Game(bgCanvas, fgCanvas) {
             this.defense.highlightRangeAt(
                 this.map.centerOfTileAt(this.mousePos));
         }
-        this.enemies.draw(this.map.sliceView.bind(this.map), this.map.alignToSlice.bind(this.map));
+        this.enemies.draw(
+            this.map.isWithinSlice.bind(this.map),
+            this.map.alignToSlice.bind(this.map));
         this.minimap.enemyDraw();
         this.minimap.viewDraw();
         this.defense.draw();
@@ -113,6 +116,10 @@ function MiniMap(origin, dims, sqrDivisions, map, enemies, viewShape) {
     this.slicePos = undefined;
     this.viewDims = dims.div(sqrDivisions);
     this.viewPort = new Menu(this.origin, this.viewDims, viewShape);
+    this.draw = function() {
+        for (const [point, val] of this.structure.sliceIter(this.slice))
+            this.tiles.draw(point.x * this.size, point.y * this.size, val);
+    };
     this.mapDraw = function() {
         map.drawMini(this.origin, this.dims);
     };
@@ -126,10 +133,10 @@ function MiniMap(origin, dims, sqrDivisions, map, enemies, viewShape) {
     this.mouseDown = function(mousePos) {
         this.viewPort.mouseAction(mousePos, this.slice.bind(this))
     };
-    this.slice = function(cell, _) {
+    this.slice = function(cell) {
         if (cell.x >= 0 && cell.y >= 0) {
-            map.divisionSlice(sqrDivisions, this.slicePos = cell);
-            map.drawSlice();
+            map.divide(sqrDivisions, this.slicePos = cell);
+            map.draw();
         }
     };
     return this;
