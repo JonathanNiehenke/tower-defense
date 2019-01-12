@@ -11,6 +11,11 @@ function MapSlice(tiles, shape) {
         this.to = this.from.add(this.dims.x, this.dims.y);
         this.offset = this.from.multi(this.size);
     };
+    this.isMapSlice = function(point) {
+        const gridPoint = this.gridPosAt(point);
+        return (this.dims.x > gridPoint.x && gridPoint.x >= 0 &&
+            this.dims.y > gridPoint.y && gridPoint.y >= 0);
+    };
     this.isWithinSlice = function(point) {
         const gridPoint = this.gridPosAt(point);
         return (this.to.x > gridPoint.x && gridPoint.x >= this.from.x &&

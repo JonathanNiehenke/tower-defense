@@ -73,7 +73,7 @@ function Game(bgCanvas, fgCanvas) {
     };
     this.draw = function() {
         this.fgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        if (this.map.isMap(this.mousePos)) {
+        if (this.map.isMapSlice(this.mousePos)) {
             this.map.highlightTileAt(this.mousePos);
             this.defense.highlightRangeAt(
                 this.map.centerOfTileAt(this.mousePos));
