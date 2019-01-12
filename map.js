@@ -21,6 +21,15 @@ function MapSlice(tiles, shape) {
         return (this.to.x > gridPoint.x && gridPoint.x >= this.from.x &&
             this.to.y > gridPoint.y && gridPoint.y >= this.from.y);
     };
+    this.centerOfTileWithinMap = function(point) {
+        return this.centerOfTileAt(this.alignToMap(point));
+    };
+    this.slicePointIs = function(point, val) {
+        return this.pointIs(this.alignToMap(point), val);
+    };
+    this.alignToMap = function(point) {
+        return point.add(this.offset.x, this.offset.y);
+    };
     this.alignToSlice = function(point) {
         return point.sub(this.offset.x, this.offset.y);
     };
