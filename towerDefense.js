@@ -83,7 +83,9 @@ function Game(bgCanvas, fgCanvas) {
             this.map.alignToSlice.bind(this.map));
         this.minimap.enemyDraw();
         this.minimap.viewDraw();
-        this.defense.draw();
+        this.defense.draw(
+            this.map.isWithinSlice.bind(this.map),
+            this.map.alignToSlice.bind(this.map));
         this.towerMenu.draw(this.mousePos);
     };
     this.mouseMove = function(e) {

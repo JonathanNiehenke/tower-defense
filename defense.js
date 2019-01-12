@@ -5,9 +5,9 @@ function DefenseNetwork(sprite, particleShape, rangeShape) {
         this.emitter.update(hitEnemies);
         this.towers.forEach(tower => tower.fireUpon(enemyPositions));
     };
-    this.draw = function() {
-        this.towers.forEach(tower => tower.draw());
-        this.emitter.draw();
+    this.draw = function(condition=undefined, offset=undefined) {
+        this.towers.forEach(tower => tower.draw(condition, offset));
+        this.emitter.draw(condition, offset);
     };
     this.upgradeAt = function(point) {
         try { this.towerAt(point).upgrade(); }
@@ -82,8 +82,9 @@ function Tower(sprite, point, type, rangeShape, addParticle) {
     this.centerFeet = new Point(this.sprite.width / 2, this.sprite.height);
     this.currentReload = this.attributes.reload;
     this.col = 6;
-    this.draw = function() {
-        let drawPos = this.point.sub(this.centerFeet.x, this.centerFeet.y);
+    this.draw = function(condition=undefined, offset=undefined) {
+        if (condition !== undefined && !condition(this.point)) return;
+        let drawPos = this.drawPos(offset);
         this.sprite.draw(
             drawPos.x, drawPos.y, this.col, this.type + this.level);
     };
@@ -91,6 +92,12 @@ function Tower(sprite, point, type, rangeShape, addParticle) {
         rangeShape.draw(
             this.point.x, this.point.y, this.attributes.range, undefined,
             "SteelBlue",  "rgba(30, 144, 255, 0.20)")
+    };
+    this.drawPos = function(offset=undefined) {
+        let drawPos = this.point.sub(this.centerFeet.x, this.centerFeet.y);
+        if (offset === undefined)
+            return drawPos;
+        return offset(drawPos);
     };
     this.upgrade = function() {
         this.level += this.level < 2 ? 1 : 0;
