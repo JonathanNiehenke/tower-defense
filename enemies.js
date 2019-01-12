@@ -93,9 +93,7 @@ function Creep(sprite, healthBarShape, circle, mapMovement, waveAttributes) {
     };
     this.drawPos = function(offset=undefined) {
         let drawPos = this.point().add(this.center.x, this.center.y).floor();
-        if (offset === undefined)
-            return drawPos;
-        return offset(drawPos);
+        return offset === undefined ? drawPos : offset(drawPos);
     };
     this.drawMini = function(x, y, size) {
         const drawPos = this.point().div(size).add(x, y);

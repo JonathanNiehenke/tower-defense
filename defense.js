@@ -95,9 +95,7 @@ function Tower(sprite, point, type, rangeShape, addParticle) {
     };
     this.drawPos = function(offset=undefined) {
         let drawPos = this.point.sub(this.centerFeet.x, this.centerFeet.y);
-        if (offset === undefined)
-            return drawPos;
-        return offset(drawPos);
+        return offset === undefined ? drawPos : offset(drawPos);
     };
     this.upgrade = function() {
         this.level += this.level < 2 ? 1 : 0;
