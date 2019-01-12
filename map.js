@@ -1,25 +1,23 @@
 function MapSlice(tiles, shape) {
     Map.call(this, tiles, shape);
-    this.slice = {"from": undefined, "to": undefined, "offset": undefined};
+    this.dims = this.from = this.to = this.offset = undefined;
     this.draw = function() {
-        for (const [point, val] of this.structure.sliceIter(this.slice))
+        for (const [point, val] of this.structure.sliceIter(this.from, this.to))
             this.tiles.draw(point.x * this.size, point.y * this.size, val);
     };
     this.divide = function(div, point) {
-        const sliceDims = this.structure.dimensions().div(div);
-        this.slice.from = new Point(point.x * sliceDims.x, point.y * sliceDims.y);
-        this.slice.to = this.slice.from.add(sliceDims.x, sliceDims.y);
-        this.slice.offset = this.slice.from.multi(this.size);
+        this.dims = this.structure.dimensions().div(div);
+        this.from = new Point(point.x * this.dims.x, point.y * this.dims.y);
+        this.to = this.from.add(this.dims.x, this.dims.y);
+        this.offset = this.from.multi(this.size);
     };
     this.isWithinSlice = function(point) {
         const gridPoint = this.gridPosAt(point);
-        return (this.slice.to.x > gridPoint.x &&
-            gridPoint.x >= this.slice.from.x &&
-            this.slice.to.y > gridPoint.y &&
-            gridPoint.y >= this.slice.from.y);
+        return (this.to.x > gridPoint.x && gridPoint.x >= this.from.x &&
+            this.to.y > gridPoint.y && gridPoint.y >= this.from.y);
     };
     this.alignToSlice = function(point) {
-        return point.sub(this.slice.offset.x, this.slice.offset.y);
+        return point.sub(this.offset.x, this.offset.y);
     };
     return this;
 }
@@ -106,7 +104,7 @@ function MapStructure() {
             for (const [x, val] of row.entries())
                 yield [new Point(x, y), val];
     };
-    this.sliceIter = function*({from, to}) {
+    this.sliceIter = function*(from, to) {
         for (const [y, row] of this.structure.slice(from.y, to.y).entries())
             for (const [x, val] of row.slice(from.x, to.x).entries())
                 yield [new Point(x, y), val];
