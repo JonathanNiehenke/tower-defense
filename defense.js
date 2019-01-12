@@ -13,8 +13,8 @@ function DefenseNetwork(sprite, particleShape, rangeShape) {
         try { this.towerAt(point).upgrade(); }
         catch (e) { if (!(e instanceof TypeError)) throw e; }
     };
-    this.highlightRangeAt = function(point) {
-        try { this.towerAt(point).highlightRange(); }
+    this.highlightRangeAt = function(point, offset=undefined) {
+        try { this.towerAt(point).highlightRange(offset); }
         catch (e) { if (!(e instanceof TypeError)) throw e; }
     };
     this.place = function(type, point) {
@@ -79,22 +79,23 @@ function Tower(sprite, point, type, rangeShape, addParticle) {
     this.variations = towerTypes[type];
     this.level = 0;
     this.attributes = this.variations[this.level];
-    this.centerFeet = new Point(this.sprite.width / 2, this.sprite.height);
+    this.center = new Point(this.sprite.width / 2, this.sprite.height);
     this.currentReload = this.attributes.reload;
     this.col = 6;
     this.draw = function(condition=undefined, offset=undefined) {
         if (condition !== undefined && !condition(this.point)) return;
-        let drawPos = this.drawPos(offset);
+        let drawPos = this.drawPos(offset).sub(this.center.x, this.center.y);
         this.sprite.draw(
             drawPos.x, drawPos.y, this.col, this.type + this.level);
     };
-    this.highlightRange = function() {
+    this.highlightRange = function(offset) {
+        let drawPos = this.drawPos(offset);
         rangeShape.draw(
-            this.point.x, this.point.y, this.attributes.range, undefined,
+            drawPos.x, drawPos.y, this.attributes.range, undefined,
             "SteelBlue",  "rgba(30, 144, 255, 0.20)")
     };
     this.drawPos = function(offset=undefined) {
-        let drawPos = this.point.sub(this.centerFeet.x, this.centerFeet.y);
+        let drawPos = this.point;
         return offset === undefined ? drawPos : offset(drawPos);
     };
     this.upgrade = function() {
