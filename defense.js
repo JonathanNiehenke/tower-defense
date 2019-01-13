@@ -20,6 +20,10 @@ function DefenseNetwork(sprite, particleShape, miniShape, rangeShape) {
         try { this.towerAt(point).highlightRange(offset); }
         catch (e) { if (!(e instanceof TypeError)) throw e; }
     };
+    this.highlightMiniRangeAt = function(point, origin, size) {
+        try { this.towerAt(point).highlightMiniRange(origin.x, origin.y, size); }
+        catch (e) { if (!(e instanceof TypeError)) throw e; }
+    };
     this.place = function(type, point) {
         if (this.towerAt(point)) return;
         this.towers.push(new Tower(
@@ -100,6 +104,12 @@ function Tower(sprite, point, type, miniShape, rangeShape, addParticle) {
         rangeShape.draw(
             drawPos.x, drawPos.y, this.attributes.range, undefined,
             "SteelBlue",  "rgba(30, 144, 255, 0.20)")
+    };
+    this.highlightMiniRange = function(x, y, size) {
+        const drawPos = this.point.div(size).add(x, y);
+        rangeShape.draw(
+            drawPos.x, drawPos.y, this.attributes.range/size, undefined,
+            "SteelBlue",  "rgba(30, 144, 255, 0.20)");
     };
     this.drawPos = function(offset=undefined) {
         let drawPos = this.point;

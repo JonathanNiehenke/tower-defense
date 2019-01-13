@@ -76,12 +76,8 @@ function Game(bgCanvas, fgCanvas) {
     };
     this.draw = function() {
         this.fgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        if (this.map.isMapSlice(this.mousePos)) {
-            this.map.highlightTileAt(this.mousePos);
-            this.defense.highlightRangeAt(
-                this.map.centerOfTileWithinMap(this.mousePos),
-                this.map.alignToSlice.bind(this.map));
-        }
+        if (this.map.isMapSlice(this.mousePos))
+            this.highlight()
         this.enemies.draw(
             this.map.isWithinSlice.bind(this.map),
             this.map.alignToSlice.bind(this.map));
@@ -92,6 +88,13 @@ function Game(bgCanvas, fgCanvas) {
             this.map.isWithinSlice.bind(this.map),
             this.map.alignToSlice.bind(this.map));
         this.towerMenu.draw(this.mousePos);
+    };
+    this.highlight = function() {
+        this.map.highlightTileAt(this.mousePos);
+        let towerPos = this.map.centerOfTileWithinMap(this.mousePos);
+        this.defense.highlightRangeAt(
+            towerPos, this.map.alignToSlice.bind(this.map));
+        this.minimap.rangeDraw(towerPos);
     };
     this.mouseMove = function(e) {
         let rect = this.canvas.getBoundingClientRect();
@@ -137,6 +140,10 @@ function MiniMap(origin, dims, sqrDivisions, map, enemies, defense, viewShape) {
     };
     this.towerDraw = function() {
         defense.drawMini(this.origin, map.dimensions().x / dims.x);
+    };
+    this.rangeDraw = function(towerPos) {
+        defense.highlightMiniRangeAt(
+            towerPos, this.origin, map.dimensions().x / dims.x);
     };
     this.viewDraw = function() {
         this.viewPort.draw(this.slicePos.x, this.slicePos.y, this.viewDims.x,
