@@ -16,19 +16,22 @@ function Game(bgCanvas, fgCanvas) {
         "roads": new Sprite(this.bgContext,  "sprites/RoadSet_Kenney.png", 2, 4),
         "outline": new RoadOutline(this.bgContext, 64, 64, "black"),
         "slime": new Sprite(this.fgContext, "sprites/SlimeIso.png", 4, 4),
+        "circle": new Circle(this.fgContext),
+        "rectangle": new Rectangle(this.fgContext),
     };
     this.map = new MapSlice(
         new TileSet(this.sprites["roads"], this.sprites["outline"]),
         new Rectangle(this.fgContext));
     this.enemies = new Enemies(
         this.sprites["slime"], new HealthBar(this.fgContext),
-        new Circle(this.fgContext), this.map.movement.bind(this.map));
-    this.defense = new DefenseNetwork(this.sprites["towers"],
-        new Orb(this.fgContext), new Circle(this.fgContext));
+        this.sprites["circle"], this.map.movement.bind(this.map));
+    this.defense = new DefenseNetwork(
+        this.sprites["towers"], new Orb(this.fgContext),
+        this.sprites["rectangle"], this.sprites["circle"]);
     this.towerMenu = new TowerMenu(
         new Point(20, 380), new Point(30, 0), this.sprites["towers"], 27/3);
     this.minimap = new MiniMap(new Point(600, 250), new Point(200, 200),
-        2, this.map, this.enemies, new Rectangle(this.fgContext));
+        2, this.map, this.enemies, this.defense, this.sprites["rectangle"]);
     this.init = function() {
         this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
         this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
@@ -83,6 +86,7 @@ function Game(bgCanvas, fgCanvas) {
             this.map.isWithinSlice.bind(this.map),
             this.map.alignToSlice.bind(this.map));
         this.minimap.enemyDraw();
+        this.minimap.towerDraw();
         this.minimap.viewDraw();
         this.defense.draw(
             this.map.isWithinSlice.bind(this.map),
@@ -115,7 +119,7 @@ function Game(bgCanvas, fgCanvas) {
     return this;
 }
 
-function MiniMap(origin, dims, sqrDivisions, map, enemies, viewShape) {
+function MiniMap(origin, dims, sqrDivisions, map, enemies, defense, viewShape) {
     this.origin = origin;
     this.dims = dims;
     this.slicePos = undefined;
@@ -130,6 +134,9 @@ function MiniMap(origin, dims, sqrDivisions, map, enemies, viewShape) {
     };
     this.enemyDraw = function() {
         enemies.drawMini(this.origin, map.dimensions().x / dims.x);
+    };
+    this.towerDraw = function() {
+        defense.drawMini(this.origin, map.dimensions().x / dims.x);
     };
     this.viewDraw = function() {
         this.viewPort.draw(this.slicePos.x, this.slicePos.y, this.viewDims.x,

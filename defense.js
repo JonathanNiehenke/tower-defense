@@ -1,4 +1,4 @@
-function DefenseNetwork(sprite, particleShape, rangeShape) {
+function DefenseNetwork(sprite, particleShape, miniShape, rangeShape) {
     this.emitter = new Emitter(particleShape);
     this.towers = [];
     this.update = function(enemyPositions, hitEnemies) {
@@ -8,6 +8,9 @@ function DefenseNetwork(sprite, particleShape, rangeShape) {
     this.draw = function(condition=undefined, offset=undefined) {
         this.towers.forEach(tower => tower.draw(condition, offset));
         this.emitter.draw(condition, offset);
+    };
+    this.drawMini = function(origin, size) {
+        this.towers.forEach(tower => tower.drawMini(origin.x, origin.y, size));
     };
     this.upgradeAt = function(point) {
         try { this.towerAt(point).upgrade(); }
@@ -20,7 +23,7 @@ function DefenseNetwork(sprite, particleShape, rangeShape) {
     this.place = function(type, point) {
         if (this.towerAt(point)) return;
         this.towers.push(new Tower(
-            sprite, point, type, rangeShape,
+            sprite, point, type, miniShape, rangeShape,
 	        this.emitter.addParticle.bind(this.emitter)));
     };
     this.towerAt = function(point) {
@@ -72,7 +75,7 @@ let towerTypes = [
         {"damage": 4, "range": 200, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8}, ],
 ];
 
-function Tower(sprite, point, type, rangeShape, addParticle) {
+function Tower(sprite, point, type, miniShape, rangeShape, addParticle) {
     this.sprite = sprite;
     this.point = point;
     this.type = type * 3;
@@ -87,6 +90,10 @@ function Tower(sprite, point, type, rangeShape, addParticle) {
         let drawPos = this.drawPos(offset).sub(this.center.x, this.center.y);
         this.sprite.draw(
             drawPos.x, drawPos.y, this.col, this.type + this.level);
+    };
+    this.drawMini = function(x, y, size) {
+        const drawPos = this.point.div(size).add(x, y);
+        miniShape.draw(drawPos.x, drawPos.y, 24/size, 24/size, "black", "black");
     };
     this.highlightRange = function(offset) {
         let drawPos = this.drawPos(offset);
