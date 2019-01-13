@@ -96,7 +96,7 @@ function Tower(sprite, point, type, miniShape, rangeShape, addParticle) {
             drawPos.x, drawPos.y, this.col, this.type + this.level);
     };
     this.drawMini = function(x, y, size) {
-        const drawPos = this.point.div(size).add(x, y);
+        const drawPos = this.point.div(size).add(x - 12/size, y - 12/size);
         miniShape.draw(drawPos.x, drawPos.y, 24/size, 24/size, "black", "black");
     };
     this.highlightRange = function(offset) {
