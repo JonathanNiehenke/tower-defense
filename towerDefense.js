@@ -125,7 +125,7 @@ function Game(bgCanvas, fgCanvas) {
 function MiniMap(origin, dims, sqrDivisions, map, enemies, defense, viewShape) {
     this.origin = origin;
     this.dims = dims;
-    this.slicePos = undefined;
+    this.slicePos = this.size = undefined;
     this.viewDims = dims.div(sqrDivisions);
     this.viewPort = new Menu(this.origin, this.viewDims, viewShape);
     this.draw = function() {
@@ -133,17 +133,17 @@ function MiniMap(origin, dims, sqrDivisions, map, enemies, defense, viewShape) {
             this.tiles.draw(point.x * this.size, point.y * this.size, val);
     };
     this.mapDraw = function() {
+        this.size = map.dimensions().x / dims.x;
         map.drawMini(this.origin, this.dims);
     };
     this.enemyDraw = function() {
-        enemies.drawMini(this.origin, map.dimensions().x / dims.x);
+        enemies.drawMini(this.origin, this.size);
     };
     this.towerDraw = function() {
-        defense.drawMini(this.origin, map.dimensions().x / dims.x);
+        defense.drawMini(this.origin, this.size);
     };
     this.rangeDraw = function(towerPos) {
-        defense.highlightMiniRangeAt(
-            towerPos, this.origin, map.dimensions().x / dims.x);
+        defense.highlightMiniRangeAt(towerPos, this.origin, this.size);
     };
     this.viewDraw = function() {
         this.viewPort.draw(this.slicePos.x, this.slicePos.y, this.viewDims.x,
