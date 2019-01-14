@@ -1,6 +1,6 @@
 function Map(tiles) {
     this.tiles = tiles;
-    this.size = this.tiles.getWidth();
+    this.size = this.tiles.size;
     this.steps = 50;
     this.directions = {
         "N": (new Point(0, -this.size / this.steps)),
@@ -52,6 +52,9 @@ function Map(tiles) {
     };
     this.gridPosAt = function(point) {
         return point.div(this.size).floor();
+    };
+    this.align = function(point) {
+        return this.tiles.align(point);
     };
     return this;
 }
@@ -117,6 +120,9 @@ function TileSet(sprite, highlight) {
             throw e;
         }
     };
+    this.align = function(point) {
+        return point;
+    };
     return this;
 }
 
@@ -137,6 +143,9 @@ function IsoTileSet(sprite, highlight) {
     };
     this.toTile = function(point) {
         return this.toIsometric(point.multi(this.size));
+    };
+    this.align = function(point) {
+        return this.toIsometric(point);
     };
     this.toIsometric = function(point) {
         return new Point(point.x - point.y, (point.x + point.y) / 2);

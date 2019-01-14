@@ -78,8 +78,8 @@ function Game(bgCanvas, fgCanvas) {
             this.defense.highlightRangeAt(
                 this.map.centerOfTileAt(this.mousePos));
         }
-        this.enemies.draw();
-        this.defense.draw();
+        this.defense.draw(this.map.align.bind(this.map));
+        this.enemies.draw(this.map.align.bind(this.map));
     };
     this.mouseMove = function(e) {
         let rect = this.canvas.getBoundingClientRect();

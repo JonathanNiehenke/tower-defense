@@ -36,11 +36,11 @@ function Enemies(sprite, healthBarShape, mapMovement) {
         for (enemy of this.enemies)
             yield enemy.point();
     };
-    this.draw = function() {
+    this.draw = function(adjust=undefined) {
         for (creep of this.enemies)
-            creep.drawHealth(this.currentWave.health);
+            creep.drawHealth(this.currentWave.health, adjust);
         for (creep of this.enemies)
-            creep.draw();
+            creep.draw(adjust);
     };
     this.hit = function(withinRange, damageAmount) {
         let creep = this.enemies.find(creep => withinRange(creep.point(), 5));
@@ -56,7 +56,7 @@ function Creep(sprite, healthBarShape, mapMovement, waveAttributes) {
     this.healthBarShape = healthBarShape;
     this.mapMovement = mapMovement;
     this.progress = {
-        "point": waveAttributes.start.add(0, -this.sprite.height / 4),
+        "point": waveAttributes.start.add(0, 0),
         "heading": waveAttributes.heading,
         "speed": waveAttributes.speed,
         "traveled": 0,
@@ -74,16 +74,20 @@ function Creep(sprite, healthBarShape, mapMovement, waveAttributes) {
         else
             throw error;
     };
-    this.drawHealth = function(initHealth) {
-        const drawPos = this.point().add(this.center.x, this.center.y).floor();
+    this.drawHealth = function(initHealth, adjust=undefined) {
+        const drawPos = this.drawPos(adjust);
         this.healthBarShape.draw(drawPos.x, drawPos.y + this.sprite.height,
             this.sprite.width, 5, "Black", this.health/initHealth);
     };
-    this.draw = function() {
+    this.draw = function(adjust=undefined) {
         const animation = Math.floor(this.progress.traveled / 5);
         const facing = this.facing[this.progress.heading];
-        const drawPos = this.point().add(this.center.x, this.center.y).floor();
+        let drawPos = this.drawPos(adjust);
         this.sprite.draw(animation, facing, drawPos.x, drawPos.y);
+    };
+    this.drawPos = function(adjust=undefined) {
+        return (adjust === undefined ? this.point() : adjust(this.point())
+            ).add(this.center.x, this.center.y).floor()
     };
     this.point = function() {
         return this.progress.point;
