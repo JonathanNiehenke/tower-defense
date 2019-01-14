@@ -37,12 +37,13 @@ function Game(bgCanvas, fgCanvas) {
         levels[num].waves.forEach(
             wave => wave.start = this.map.startPos(wave.start));
         this.enemies.newWaves(levels[num].waves);
-        this.map.draw();
+        this.drawFromMiddle(this.bgContext, this.map.draw.bind(this.map));
         this.animation = setInterval(this.loop.bind(this), 28);
     };
     this.loop = function() {
         this.update();
-        this.draw();
+        this.drawFromMiddle(this.fgContext, this.draw.bind(this));
+        this.towerMenu.draw(this.mousePos);
     };
     this.update = function() {
         this.enemies.update();
@@ -64,8 +65,14 @@ function Game(bgCanvas, fgCanvas) {
         try { this.loadLevel(this.levelNum++) }
         catch (_) { this.end(); }
     };
+    this.drawFromMiddle = function(context, drawFunc) {
+        context.save();
+        context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        context.translate(this.canvas.width / 2, 0);
+        drawFunc();
+        context.restore();
+    };
     this.draw = function() {
-        this.fgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
         if (this.map.isMap(this.mousePos)) {
             this.map.highlightTileAt(this.mousePos);
             this.defense.highlightRangeAt(
@@ -73,7 +80,6 @@ function Game(bgCanvas, fgCanvas) {
         }
         this.enemies.draw();
         this.defense.draw();
-        this.towerMenu.draw(this.mousePos);
     };
     this.mouseMove = function(e) {
         let rect = this.canvas.getBoundingClientRect();
