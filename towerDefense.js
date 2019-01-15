@@ -73,21 +73,25 @@ function Game(bgCanvas, fgCanvas) {
         context.restore();
     };
     this.draw = function() {
-        if (this.map.isMap(this.mousePos)) {
-            this.map.highlightTileAt(this.mousePos);
-            this.defense.highlightRangeAt(
-                this.map.centerOfTileAt(this.mousePos));
-        }
+        this.highlight();
         this.defense.draw(this.map.align.bind(this.map));
         this.enemies.draw(this.map.align.bind(this.map));
+    };
+    this.highlight = function() {
+        const mouseIso = this.mousePos.sub(this.canvas.width / 2, 0);
+        if (this.map.isMap(mouseIso)) {
+            this.map.highlightTileAt(mouseIso);
+            this.defense.highlightRangeAt(this.map.centerOfTileAt(mouseIso));
+        }
     };
     this.mouseMove = function(e) {
         let rect = this.canvas.getBoundingClientRect();
         this.mousePos.change(e.clientX - rect.x, e.clientY - rect.y);
     };
     this.mouseDown = function() {
-        if (this.map.isMap(this.mousePos))
-            this.defense.upgradeAt(this.map.centerOfTileAt(this.mousePos));
+        const mouseIso = this.mousePos.sub(this.canvas.width / 2, 0);
+        if (this.map.isMap(mouseIso))
+            this.defense.upgradeAt(this.map.centerOfTileAt(mouseIso));
         this.towerMenu.mouseDown(this.mousePos);
     };
     this.mouseUp = function() {

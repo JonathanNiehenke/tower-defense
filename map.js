@@ -30,10 +30,10 @@ function Map(tiles) {
         return this.tiles.movement(this.tileValueAt(point), heading);
     };
     this.isMap = function(point) {
-        return this.tileValueAt(point) !== undefined;
+        return this.structure.value(this.tiles.toGrid(point)) !== undefined;
     };
     this.pointIs = function(point, val) {
-        return this.tileValueAt(point) === val;
+        return this.structure.value(this.tiles.toGrid(point)) === val;
     };
     this.tileValueAt = function(point) {
         return this.structure.value(this.gridPosAt(point));
