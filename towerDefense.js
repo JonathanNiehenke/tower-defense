@@ -20,7 +20,7 @@ function Game(bgCanvas, fgCanvas) {
     this.map = new Map(new IsoTileSet(
         this.sprites["iroads"], new IsoRectangle(this.fgContext)));
     this.enemies = new Enemies(this.sprites["slime"],
-        new HealthBar(this.fgContext), this.map.movement.bind(this.map));
+        new HealthBar(this.fgContext), this.map.movement.bind(this.map), new Circle(this.fgContext));
     this.defense = new DefenseNetwork(this.sprites["towers"],
         new Orb(this.fgContext), new Circle(this.fgContext));
     this.towerMenu = new TowerMenu(
@@ -73,16 +73,16 @@ function Game(bgCanvas, fgCanvas) {
         context.restore();
     };
     this.draw = function() {
-        this.highlight();
+        this.highlight(this.mousePos.sub(this.canvas.width / 2, 0));
         this.defense.draw(this.map.align.bind(this.map));
         this.enemies.draw(this.map.align.bind(this.map));
     };
-    this.highlight = function() {
-        const mouseIso = this.mousePos.sub(this.canvas.width / 2, 0);
-        if (this.map.isMap(mouseIso)) {
-            this.map.highlightTileAt(mouseIso);
-            this.defense.highlightRangeAt(this.map.centerOfTileAt(mouseIso));
-        }
+    this.highlight = function(mouseIso) {
+        if (!this.map.isMap(mouseIso)) return;
+        this.map.highlightTileAt(mouseIso);
+        this.defense.highlightRangeAt(
+            this.map.centerOfTileAt(mouseIso, true),
+            this.map.align.bind(this.map));
     };
     this.mouseMove = function(e) {
         let rect = this.canvas.getBoundingClientRect();
@@ -91,7 +91,7 @@ function Game(bgCanvas, fgCanvas) {
     this.mouseDown = function() {
         const mouseIso = this.mousePos.sub(this.canvas.width / 2, 0);
         if (this.map.isMap(mouseIso))
-            this.defense.upgradeAt(this.map.centerOfTileAt(mouseIso));
+            this.defense.upgradeAt(this.map.centerOfTileAt(mouseIso, true));
         this.towerMenu.mouseDown(this.mousePos);
     };
     this.mouseUp = function() {
