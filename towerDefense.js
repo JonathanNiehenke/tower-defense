@@ -95,10 +95,10 @@ function Game(bgCanvas, fgCanvas) {
         this.towerMenu.mouseDown(this.mousePos);
     };
     this.mouseUp = function() {
+        const mouseIso = this.mousePos.sub(this.canvas.width / 2, 0);
         const type = this.towerMenu.mouseUpValue();
-        if (type !== undefined && this.map.pointIs(this.mousePos, 0)) {
-            this.defense.place(
-                type, this.map.centerOfTileAt(this.mousePos));
+        if (type !== undefined && this.map.pointIs(mouseIso, 0)) {
+            this.defense.place(type, this.map.centerOfTileAt(mouseIso, true));
         }
     };
     this.end = function() {

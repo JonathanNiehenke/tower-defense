@@ -29,29 +29,31 @@ function Map(tiles) {
     this.heading = function(point, heading) {
         return this.tiles.movement(this.tileValueAt(point), heading);
     };
-    this.isMap = function(point) {
-        return this.structure.value(this.tiles.toGrid(point)) !== undefined;
+    this.isMap = function(mousePoint) {
+        return this.tileValueAt(mousePoint, true) !== undefined;
     };
-    this.pointIs = function(point, val) {
-        return this.structure.value(this.tiles.toGrid(point)) === val;
+    this.pointIs = function(mousePoint, val) {
+        return this.tileValueAt(mousePoint, true) === val;
     };
-    this.tileValueAt = function(point) {
-        return this.structure.value(this.gridPosAt(point));
+    this.tileValueAt = function(point, fromMouse=false) {
+        return this.structure.value(this.gridPosAt(point, fromMouse));
     };
     this.startPos = function([x, y]) {
-        return this.centerOfTileAt(this.toTile(new Point(x, y)));
+        return this.toTile(new Point(x, y)).add(this.size / 2, this.size / 2);
     };
-    this.centerOfTileAt = function(point) {
-        return this.topOfTileAt(point).add(this.size / 2, this.size / 2);
+    this.centerOfTileAt = function(point, fromMouse=false) {
+        return this.topOfTileAt(point, fromMouse).add(
+            this.size / 2, this.size / 2);
     };
-    this.topOfTileAt = function(point) {
-        return this.toTile(this.gridPosAt(point));
+    this.topOfTileAt = function(point, fromMouse=false) {
+        return this.toTile(this.gridPosAt(point, fromMouse));
     };
     this.toTile = function(gridPoint) {
         return gridPoint.multi(this.size);
     };
-    this.gridPosAt = function(point) {
-        return point.div(this.size).floor();
+    this.gridPosAt = function(point, fromMouse=false) {
+        return (fromMouse
+            ? this.tiles.toGrid(point) : point.div(this.size).floor());
     };
     this.align = function(point) {
         return this.tiles.align(point);
