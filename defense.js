@@ -13,8 +13,8 @@ function DefenseNetwork(sprite, particleShape, rangeShape) {
         try { this.towerAt(point).upgrade(); }
         catch (e) { if (!(e instanceof TypeError)) throw e; }
     };
-    this.highlightRangeAt = function(point, adjust=undefined) {
-        try { this.towerAt(point).highlightRange(adjust); }
+    this.highlightRangeAt = function(point, adjust=undefined, scalingFactor) {
+        try { this.towerAt(point).highlightRange(adjust, scalingFactor); }
         catch (e) { if (!(e instanceof TypeError)) throw e; }
     };
     this.place = function(type, point) {
@@ -87,11 +87,11 @@ function Tower(sprite, point, type, rangeShape, addParticle) {
         this.sprite.draw(
             this.col, this.type + this.level, drawPos.x, drawPos.y);
     };
-    this.highlightRange = function(adjust) {
+    this.highlightRange = function(adjust, scalingFactor) {
         let drawPos = this.drawPos(adjust);
         rangeShape.draw(
-            drawPos.x, drawPos.y, this.attributes.range, undefined,
-            "SteelBlue",  "rgba(30, 144, 255, 0.20)")
+            drawPos.x, drawPos.y, this.attributes.range * scalingFactor,
+            undefined, "SteelBlue",  "rgba(30, 144, 255, 0.20)")
     };
     this.drawPos = function(adjust=undefined) {
         return adjust === undefined ? this.point : adjust(this.point);

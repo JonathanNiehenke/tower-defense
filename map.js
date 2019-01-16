@@ -52,6 +52,9 @@ function Map(tiles) {
         return (fromMouse
             ? this.tiles.toGrid(point) : point.div(this.scale).floor());
     };
+    this.scalingFactor = function() {
+        return this.tiles.size/this.scale;
+    };
     this.align = function(point) {
         return this.tiles.align(point, this.scale);
     };
