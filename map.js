@@ -1,12 +1,9 @@
 function Map(tiles) {
     this.tiles = tiles;
-    this.size = this.tiles.size;
-    this.steps = 50;
+    this.scale = 60;  // Multiple of 5, 4, 3 and 2 for 1/5th speed etc.
     this.directions = {
-        "N": (new Point(0, -this.size / this.steps)),
-        "S": (new Point(0, this.size / this.steps)),
-        "E": (new Point(this.size / this.steps, 0)),
-        "W": (new Point(-this.size / this.steps, 0)),
+        "N": (new Point(0, -1)), "S": (new Point(0, 1)),
+        "E": (new Point(1, 0)), "W": (new Point(-1, 0)),
     };
     this.structure = new MapStructure();
     this.applyLevel = function(structure) {
@@ -20,7 +17,7 @@ function Map(tiles) {
         this.tiles.highlightAt(point);
     };
     this.movement = function(progress) {
-        if (progress.traveled % this.steps < progress.speed)
+        if (progress.traveled % this.scale < progress.speed)
             progress.heading = this.heading(progress.point, progress.heading);
         const trajectory = this.directions[progress.heading];
         progress.point.iAdd(trajectory.multi(progress.speed));
@@ -39,24 +36,27 @@ function Map(tiles) {
         return this.structure.value(this.gridPosAt(point, fromMouse));
     };
     this.startPos = function([x, y]) {
-        return this.toTile(new Point(x, y)).add(this.size / 2, this.size / 2);
+        return this.toTile(new Point(x, y)).add(this.scale / 2, this.scale / 2);
     };
     this.centerOfTileAt = function(point, fromMouse=false) {
         return this.topOfTileAt(point, fromMouse).add(
-            this.size / 2, this.size / 2);
+            this.scale / 2, this.scale / 2);
     };
     this.topOfTileAt = function(point, fromMouse=false) {
         return this.toTile(this.gridPosAt(point, fromMouse));
     };
     this.toTile = function(gridPoint) {
-        return gridPoint.multi(this.size);
+        return gridPoint.multi(this.scale);
     };
     this.gridPosAt = function(point, fromMouse=false) {
         return (fromMouse
-            ? this.tiles.toGrid(point) : point.div(this.size).floor());
+            ? this.tiles.toGrid(point) : point.div(this.scale).floor());
+    };
+    this.scalingFactor = function() {
+        return this.tiles.size/this.scale;
     };
     this.align = function(point) {
-        return this.tiles.align(point);
+        return this.tiles.align(point, this.scale);
     };
     return this;
 }
@@ -122,8 +122,8 @@ function TileSet(sprite, highlight) {
             throw e;
         }
     };
-    this.align = function(point) {
-        return point;
+    this.align = function(point, scale) {
+        return point.multi(this.size/scale);
     };
     return this;
 }
@@ -146,8 +146,8 @@ function IsoTileSet(sprite, highlight) {
     this.toTile = function(point) {
         return this.toIsometric(point.multi(this.size));
     };
-    this.align = function(point) {
-        return this.toIsometric(point);
+    this.align = function(point, scale) {
+        return this.toIsometric(point).multi(this.size/scale);
     };
     this.toIsometric = function(point) {
         return new Point(point.x - point.y, (point.x + point.y) / 2);

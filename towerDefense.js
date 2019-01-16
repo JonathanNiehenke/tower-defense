@@ -80,9 +80,8 @@ function Game(bgCanvas, fgCanvas) {
     this.highlight = function(mouseIso) {
         if (!this.map.isMap(mouseIso)) return;
         this.map.highlightTileAt(mouseIso);
-        this.defense.highlightRangeAt(
-            this.map.centerOfTileAt(mouseIso, true),
-            this.map.align.bind(this.map));
+        this.defense.highlightRangeAt(this.map.centerOfTileAt(mouseIso, true),
+            this.map.align.bind(this.map), this.map.scalingFactor());
     };
     this.mouseMove = function(e) {
         let rect = this.canvas.getBoundingClientRect();
