@@ -87,7 +87,7 @@ function IsoCircle(context) {
     };
     this.path = function(x, y, radius) {
         this.context.beginPath();
-        this.context.ellipse(x, y, radius, radius / 2, 0, 0, 2 * Math.PI);
+        this.context.ellipse(x, y, radius * 1.4353, radius * 0.7108, 0, 0, 2 * Math.PI);
     };
     return this;
 }
