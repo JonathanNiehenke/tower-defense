@@ -1,4 +1,4 @@
-function DefenseNetwork(sprite, particleShape, rangeShape, miniShape) {
+function DefenseNetwork(sprite, particleShape, rangeShape, miniShape, miniRange) {
     this.emitter = new Emitter(particleShape);
     this.towers = [];
     this.update = function(enemyPositions, hitEnemies) {
@@ -27,7 +27,7 @@ function DefenseNetwork(sprite, particleShape, rangeShape, miniShape) {
     this.place = function(type, point) {
         if (this.towerAt(point)) return;
         this.towers.push(new Tower(
-            sprite, point, type, rangeShape, miniShape,
+            sprite, point, type, rangeShape, miniShape, miniRange,
 	        this.emitter.addParticle.bind(this.emitter)));
     };
     this.towerAt = function(point) {
@@ -79,7 +79,7 @@ let towerTypes = [
         {"damage": 4, "range": 200, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8}, ],
 ];
 
-function Tower(sprite, point, type, rangeShape, miniShape, addParticle) {
+function Tower(sprite, point, type, rangeShape, miniShape, miniRange, addParticle) {
     this.sprite = sprite;
     this.point = point;
     this.type = type * 3;
@@ -107,7 +107,7 @@ function Tower(sprite, point, type, rangeShape, miniShape, addParticle) {
     };
     this.highlightMiniRange = function(x, y, size) {
         const drawPos = this.point.div(size).add(x, y);
-        rangeShape.draw(
+        miniRange.draw(
             drawPos.x, drawPos.y, this.attributes.range/size,
             undefined, "SteelBlue",  "rgba(30, 144, 255, 0.20)");
     };
