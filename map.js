@@ -17,7 +17,9 @@ function MapSlice(tiles, shape) {
             this.dims.y > gridPoint.y && gridPoint.y >= 0);
     };
     this.isWithinSlice = function(point) {
-        const gridPoint = this.gridPosAt(point);
+        return this.isWithinGridSlice(this.gridPosAt(point));
+    };
+    this.isWithinGridSlice = function(gridPoint) {
         return (this.to.x > gridPoint.x && gridPoint.x >= this.from.x &&
             this.to.y > gridPoint.y && gridPoint.y >= this.from.y);
     };
@@ -26,7 +28,10 @@ function MapSlice(tiles, shape) {
             this.size / 2, this.size / 2);
     };
     this.slicePointIs = function(point, val) {
-        return this.structure.value(this.slicePointAt(point)) === val;
+        const gridPoint = this.slicePointAt(point);
+        if (this.isWithinGridSlice(gridPoint))
+            return this.structure.value(gridPoint) === val;
+        return false;
     };
     this.slicePointAt = function(point) {
         return this.gridPosAt(point).add(this.from.x, this.from.y);
