@@ -17,8 +17,8 @@ function Game(bgCanvas, fgCanvas) {
         "iroads": new Sprite(this.bgContext,  "sprites/IsoRoadSet_Kenney.png", 2, 4),
         "slime": new Sprite(this.fgContext, "sprites/SlimeIso.png", 4, 4),
     };
-    this.map = new Map(new IsoTileSet(
-        this.sprites["iroads"], new IsoRectangle(this.fgContext)));
+    this.map = new Map(new Point(this.canvas.width / 2, 0),
+        new IsoTileSet(this.sprites["iroads"], new IsoRectangle(this.fgContext)));
     this.enemies = new Enemies(this.sprites["slime"],
         new HealthBar(this.fgContext), this.map.movement.bind(this.map), new Circle(this.fgContext));
     this.defense = new DefenseNetwork(this.sprites["towers"],
@@ -37,13 +37,12 @@ function Game(bgCanvas, fgCanvas) {
         levels[num].waves.forEach(
             wave => wave.start = this.map.startPos(wave.start));
         this.enemies.newWaves(levels[num].waves);
-        this.drawFromMiddle(this.bgContext, this.map.draw.bind(this.map));
+        this.map.draw();
         this.animation = setInterval(this.loop.bind(this), 28);
     };
     this.loop = function() {
         this.update();
-        this.drawFromMiddle(this.fgContext, this.draw.bind(this));
-        this.towerMenu.draw(this.mousePos);
+        this.draw();
     };
     this.update = function() {
         this.enemies.update();
@@ -65,17 +64,12 @@ function Game(bgCanvas, fgCanvas) {
         try { this.loadLevel(this.levelNum++) }
         catch (_) { this.end(); }
     };
-    this.drawFromMiddle = function(context, drawFunc) {
-        context.save();
-        context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        context.translate(this.canvas.width / 2, 0);
-        drawFunc();
-        context.restore();
-    };
     this.draw = function() {
+        this.fgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.highlight(this.mousePos.sub(this.canvas.width / 2, 0));
         this.defense.draw(this.map.align.bind(this.map));
         this.enemies.draw(this.map.align.bind(this.map));
+        this.towerMenu.draw(this.mousePos);
     };
     this.highlight = function(mouseIso) {
         if (!this.map.isMap(mouseIso)) return;

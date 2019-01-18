@@ -1,4 +1,5 @@
-function Map(tiles) {
+function Map(drawnOrigin, tiles) {
+    this.drawnOrigin = drawnOrigin;
     this.tiles = tiles;
     this.scale = 60;  // Multiple of 5, 4, 3 and 2 for 1/5th speed etc.
     this.directions = {
@@ -11,10 +12,10 @@ function Map(tiles) {
     };
     this.draw = function() {
         for (const [point, val] of this.structure.iter())
-            this.tiles.draw(point, val);
+            this.tiles.draw(this.drawnOrigin, point, val);
     };
     this.highlightTileAt = function(point) {
-        this.tiles.highlightAt(point);
+        this.tiles.highlightAt(this.drawnOrigin, point);
     };
     this.movement = function(progress) {
         if (progress.traveled % this.scale < progress.speed)
@@ -56,7 +57,8 @@ function Map(tiles) {
         return this.tiles.size/this.scale;
     };
     this.align = function(point) {
-        return this.tiles.align(point, this.scale);
+        return this.tiles.align(point, this.scale).add(
+            this.drawnOrigin.x, this.drawnOrigin.y);
     };
     return this;
 }
@@ -98,13 +100,13 @@ function TileSet(sprite, highlight) {
     this.getHeight = function() {
         return this.sprite.height;
     };
-    this.draw = function(point, tileVal) {
-        const drawPos = this.toTile(point);
+    this.draw = function(origin, point, tileVal) {
+        const drawPos = this.toTile(point).add(origin.x, origin.y);
         this.sprite.draw(
             tileVal % 4, Math.floor(tileVal / 4), drawPos.x, drawPos.y);
     };
-    this.highlightAt = function(point) {
-        const drawPos = this.toTile(this.toGrid(point));
+    this.highlightAt = function(origin, point) {
+        const drawPos = this.toTile(this.toGrid(point)).add(origin.x, origin.y);
         this.highlight.draw(drawPos.x, drawPos.y, this.size, this.size,
             "silver",  "rgba(255, 255, 255, 0.20)");
     };
@@ -134,8 +136,8 @@ function IsoTileSet(sprite, highlight) {
     this.drawnDims = function([x, y]) {
         this.offset.change(y * this.size, 0);
     };
-    this.draw = function(point, tileVal) {
-        const drawPos = this.toTile(point);
+    this.draw = function(origin, point, tileVal) {
+        const drawPos = this.toTile(point).add(origin.x, origin.y);
         this.sprite.draw(
             tileVal % 4, Math.floor(tileVal / 4),
             drawPos.x - this.size, drawPos.y);
