@@ -12,22 +12,25 @@ function Game(bgCanvas, fgCanvas) {
     this.animation = undefined;
     this.levelNum = 0;
     this.sprites = {
+        "slime": new Sprite(this.fgContext, "sprites/SlimeIso.png", 4, 4),
         "towers": new Sprite(this.fgContext, "sprites/Towers.png", 27, 8),
         "roads": new Sprite(this.bgContext,  "sprites/RoadSet_Kenney.png", 2, 4),
-        "outline": new RoadOutline(this.bgContext, 64, 64, "black"),
-        "slime": new Sprite(this.fgContext, "sprites/SlimeIso.png", 4, 4),
         "circle": new Circle(this.fgContext),
         "rectangle": new Rectangle(this.fgContext),
+        "iroads": new Sprite(this.bgContext,  "sprites/IsoRoadSet_Kenney.png", 2, 4),
+        "icircle": new IsoCircle(this.fgContext),
+        "irectangle": new IsoRectangle(this.fgContext),
+        "outline": new RoadOutline(this.bgContext, 64, 64, "black"),
     };
     this.map = new MapSlice(
-        new TileSet(this.sprites["roads"], this.sprites["outline"]),
-        new Rectangle(this.fgContext));
+        new IsoTileSet(this.sprites["iroads"], this.sprites["irectangle"], this.sprites["outline"]),
+        this.sprites["rectangle"]);
     this.enemies = new Enemies(
         this.sprites["slime"], new HealthBar(this.fgContext),
         this.sprites["circle"], this.map.movement.bind(this.map));
     this.defense = new DefenseNetwork(
         this.sprites["towers"], new Orb(this.fgContext),
-        this.sprites["rectangle"], this.sprites["circle"]);
+        new IsoCircle(this.fgContext), this.sprites["rectangle"]);
     this.towerMenu = new TowerMenu(
         new Point(20, 380), new Point(30, 0), this.sprites["towers"], 27/3);
     this.minimap = new MiniMap(new Point(600, 250), new Point(200, 200),
@@ -44,15 +47,18 @@ function Game(bgCanvas, fgCanvas) {
         levels[num].waves.forEach(
             wave => wave.start = this.map.startPos(wave.start));
         this.enemies.newWaves(levels[num].waves);
-        this.bgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.minimap.slice(new Point(0, 0));
-        this.map.draw();
+        this.drawFromMiddle(this.bgContext, this.map.draw.bind(this.map));
         this.minimap.mapDraw();
         this.animation = setInterval(this.loop.bind(this), 28);
     };
     this.loop = function() {
         this.update();
-        this.draw();
+        this.drawFromMiddle(this.fgContext, this.draw.bind(this));
+        this.towerMenu.draw(this.mousePos);
+        this.minimap.enemyDraw();
+        this.minimap.towerDraw();
+        this.minimap.viewDraw();
     };
     this.update = function() {
         this.enemies.update();
@@ -74,26 +80,28 @@ function Game(bgCanvas, fgCanvas) {
         try { this.loadLevel(this.levelNum++) }
         catch (_) { this.end(); }
     };
+    this.drawFromMiddle = function(context, drawFunc) {
+        context.save();
+        context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        context.translate(this.canvas.width / 2, 0);
+        drawFunc();
+        context.restore();
+    };
     this.draw = function() {
-        this.fgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        if (this.map.isMapSlice(this.mousePos))
-            this.highlight()
+        this.highlight(this.mousePos.sub(this.canvas.width / 2, 0));
         this.enemies.draw(
             this.map.isWithinSlice.bind(this.map),
             this.map.alignToSlice.bind(this.map));
-        this.minimap.enemyDraw();
-        this.minimap.towerDraw();
-        this.minimap.viewDraw();
         this.defense.draw(
             this.map.isWithinSlice.bind(this.map),
             this.map.alignToSlice.bind(this.map));
-        this.towerMenu.draw(this.mousePos);
     };
-    this.highlight = function() {
-        this.map.highlightTileAt(this.mousePos);
-        let towerPos = this.map.centerOfTileWithinMap(this.mousePos);
-        this.defense.highlightRangeAt(
-            towerPos, this.map.alignToSlice.bind(this.map));
+    this.highlight = function(mouseIso) {
+        if (!this.map.isMapSlice(mouseIso)) return;
+        this.map.highlightTileAt(mouseIso);
+        let towerPos = this.map.centerOfTileWithinMap(mouseIso, true);
+        this.defense.highlightRangeAt(towerPos,
+            this.map.alignToSlice.bind(this.map), this.map.scalingFactor());
         this.minimap.rangeDraw(towerPos);
     };
     this.mouseMove = function(e) {
@@ -101,24 +109,26 @@ function Game(bgCanvas, fgCanvas) {
         this.mousePos.change(e.clientX - rect.x, e.clientY - rect.y);
     };
     this.mouseDown = function() {
-        if (this.map.isMap(this.mousePos)) {
+        const mouseIso = this.mousePos.sub(this.canvas.width / 2, 0);
+        if (this.map.isMap(mouseIso)) {
             this.defense.upgradeAt(
-                this.map.centerOfTileWithinMap(this.mousePos));
+                this.map.centerOfTileWithinMap(mouseIso, true));
         }
         this.towerMenu.mouseDown(this.mousePos);
         this.minimap.mouseDown(this.mousePos);
     };
     this.mouseUp = function() {
+        const mouseIso = this.mousePos.sub(this.canvas.width / 2, 0);
         const type = this.towerMenu.mouseUpValue();
-        if (type !== undefined && this.map.slicePointIs(this.mousePos, 0)) {
+        if (type !== undefined && this.map.slicePointIs(mouseIso, 0)) {
             this.defense.place(
-                type, this.map.centerOfTileWithinMap(this.mousePos));
+                type, this.map.centerOfTileWithinMap(mouseIso, true));
         }
     };
     this.end = function() {
         clearInterval(this.animation);
         alert("Game Over");
-    }
+    };
     return this;
 }
 

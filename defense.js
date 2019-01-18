@@ -1,13 +1,13 @@
-function DefenseNetwork(sprite, particleShape, miniShape, rangeShape) {
+function DefenseNetwork(sprite, particleShape, rangeShape, miniShape) {
     this.emitter = new Emitter(particleShape);
     this.towers = [];
     this.update = function(enemyPositions, hitEnemies) {
         this.emitter.update(hitEnemies);
         this.towers.forEach(tower => tower.fireUpon(enemyPositions));
     };
-    this.draw = function(condition=undefined, offset=undefined) {
-        this.towers.forEach(tower => tower.draw(condition, offset));
-        this.emitter.draw(condition, offset);
+    this.draw = function(condition=undefined, adjust=undefined) {
+        this.towers.forEach(tower => tower.draw(condition, adjust));
+        this.emitter.draw(condition, adjust);
     };
     this.drawMini = function(origin, size) {
         this.towers.forEach(tower => tower.drawMini(origin.x, origin.y, size));
@@ -16,8 +16,8 @@ function DefenseNetwork(sprite, particleShape, miniShape, rangeShape) {
         try { this.towerAt(point).upgrade(); }
         catch (e) { if (!(e instanceof TypeError)) throw e; }
     };
-    this.highlightRangeAt = function(point, offset=undefined) {
-        try { this.towerAt(point).highlightRange(offset); }
+    this.highlightRangeAt = function(point, adjust=undefined, scalingFactor) {
+        try { this.towerAt(point).highlightRange(adjust, scalingFactor); }
         catch (e) { if (!(e instanceof TypeError)) throw e; }
     };
     this.highlightMiniRangeAt = function(point, origin, size) {
@@ -27,7 +27,7 @@ function DefenseNetwork(sprite, particleShape, miniShape, rangeShape) {
     this.place = function(type, point) {
         if (this.towerAt(point)) return;
         this.towers.push(new Tower(
-            sprite, point, type, miniShape, rangeShape,
+            sprite, point, type, rangeShape, miniShape,
 	        this.emitter.addParticle.bind(this.emitter)));
     };
     this.towerAt = function(point) {
@@ -79,19 +79,19 @@ let towerTypes = [
         {"damage": 4, "range": 200, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8}, ],
 ];
 
-function Tower(sprite, point, type, miniShape, rangeShape, addParticle) {
+function Tower(sprite, point, type, rangeShape, miniShape, addParticle) {
     this.sprite = sprite;
     this.point = point;
     this.type = type * 3;
     this.variations = towerTypes[type];
     this.level = 0;
     this.attributes = this.variations[this.level];
-    this.center = new Point(this.sprite.width / 2, this.sprite.height);
+    this.centerFeet = new Point(this.sprite.width / 2, this.sprite.height);
     this.currentReload = this.attributes.reload;
     this.col = 6;
-    this.draw = function(condition=undefined, offset=undefined) {
+    this.draw = function(condition=undefined, adjust=undefined) {
         if (condition !== undefined && !condition(this.point)) return;
-        let drawPos = this.drawPos(offset).sub(this.center.x, this.center.y);
+        let drawPos = this.drawPos(adjust).sub(this.centerFeet.x, this.centerFeet.y);
         this.sprite.draw(
             drawPos.x, drawPos.y, this.col, this.type + this.level);
     };
@@ -99,21 +99,20 @@ function Tower(sprite, point, type, miniShape, rangeShape, addParticle) {
         const drawPos = this.point.div(size).add(x - 12/size, y - 12/size);
         miniShape.draw(drawPos.x, drawPos.y, 24/size, 24/size, "black", "black");
     };
-    this.highlightRange = function(offset) {
-        let drawPos = this.drawPos(offset);
+    this.highlightRange = function(adjust, scalingFactor) {
+        let drawPos = this.drawPos(adjust);
         rangeShape.draw(
-            drawPos.x, drawPos.y, this.attributes.range, undefined,
-            "SteelBlue",  "rgba(30, 144, 255, 0.20)")
+            drawPos.x, drawPos.y, this.attributes.range * scalingFactor,
+            undefined, "SteelBlue",  "rgba(30, 144, 255, 0.20)")
     };
     this.highlightMiniRange = function(x, y, size) {
         const drawPos = this.point.div(size).add(x, y);
         rangeShape.draw(
-            drawPos.x, drawPos.y, this.attributes.range/size, undefined,
-            "SteelBlue",  "rgba(30, 144, 255, 0.20)");
+            drawPos.x, drawPos.y, this.attributes.range/size,
+            undefined, "SteelBlue",  "rgba(30, 144, 255, 0.20)");
     };
-    this.drawPos = function(offset=undefined) {
-        let drawPos = this.point;
-        return offset === undefined ? drawPos : offset(drawPos);
+    this.drawPos = function(adjust=undefined) {
+        return adjust === undefined ? this.point : adjust(this.point);
     };
     this.upgrade = function() {
         this.level += this.level < 2 ? 1 : 0;

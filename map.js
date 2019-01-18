@@ -3,16 +3,16 @@ function MapSlice(tiles, shape) {
     this.dims = this.from = this.to = this.offset = undefined;
     this.draw = function() {
         for (const [point, val] of this.structure.sliceIter(this.from, this.to))
-            this.tiles.draw(point.x * this.size, point.y * this.size, val);
+            this.tiles.draw(point, val);
     };
     this.divide = function(div, point) {
         this.dims = this.structure.dimensions().div(div);
         this.from = new Point(point.x * this.dims.x, point.y * this.dims.y);
         this.to = this.from.add(this.dims.x, this.dims.y);
-        this.offset = this.from.multi(this.size);
+        this.offset = this.from.multi(this.scale);
     };
     this.isMapSlice = function(point) {
-        const gridPoint = this.gridPosAt(point);
+        const gridPoint = this.gridPosAt(point, true);
         return (this.dims.x > gridPoint.x && gridPoint.x >= 0 &&
             this.dims.y > gridPoint.y && gridPoint.y >= 0);
     };
@@ -23,21 +23,21 @@ function MapSlice(tiles, shape) {
         return (this.to.x > gridPoint.x && gridPoint.x >= this.from.x &&
             this.to.y > gridPoint.y && gridPoint.y >= this.from.y);
     };
-    this.centerOfTileWithinMap = function(point) {
-        return this.toTile(this.slicePointAt(point)).add(
-            this.size / 2, this.size / 2);
+    this.centerOfTileWithinMap = function(point, fromMouse=false) {
+        return this.toTile(this.slicePointAt(point, true)).add(
+            this.scale / 2, this.scale / 2);
     };
     this.slicePointIs = function(point, val) {
-        const gridPoint = this.slicePointAt(point);
+        const gridPoint = this.slicePointAt(point, true);
         if (this.isWithinGridSlice(gridPoint))
             return this.structure.value(gridPoint) === val;
         return false;
     };
-    this.slicePointAt = function(point) {
-        return this.gridPosAt(point).add(this.from.x, this.from.y);
+    this.slicePointAt = function(point, fromMouse=false) {
+        return this.gridPosAt(point, fromMouse).add(this.from.x, this.from.y);
     };
     this.alignToSlice = function(point) {
-        return point.sub(this.offset.x, this.offset.y);
+        return this.align(point.sub(this.offset.x, this.offset.y));
     };
     return this;
 }
@@ -45,13 +45,10 @@ function MapSlice(tiles, shape) {
 function Map(tiles, shape) {
     this.tiles = tiles;
     this.shape = shape;
-    this.size = this.tiles.getWidth();
-    this.steps = 50;
+    this.scale = 60;  // Multiple of 5, 4, 3 and 2 for 1/5th speed etc.
     this.directions = {
-        "N": (new Point(0, -this.size / this.steps)),
-        "S": (new Point(0, this.size / this.steps)),
-        "E": (new Point(this.size / this.steps, 0)),
-        "W": (new Point(-this.size / this.steps, 0)),
+        "N": (new Point(0, -1)), "S": (new Point(0, 1)),
+        "E": (new Point(1, 0)), "W": (new Point(-1, 0)),
     };
     this.structure = new MapStructure();
     this.applyLevel = function(structure) {
@@ -59,7 +56,7 @@ function Map(tiles, shape) {
     };
     this.draw = function() {
         for (const [point, val] of this.structure.iter())
-            this.tiles.draw(point.x * this.size, point.y * this.size, val);
+            this.tiles.draw(point, val);
     };
     this.drawMini = function(origin, dims) {
         const sDims = this.structure.dimensions();
@@ -69,13 +66,11 @@ function Map(tiles, shape) {
                 origin.x + point.x*size.x, origin.y + point.y*size.y, val, size.x);
         }
     };
-    this.highlightTileAt = function(gridPoint) {
-        const iPoint = this.topOfTileAt(gridPoint);
-        this.shape.draw(iPoint.x, iPoint.y, this.size, this.size,
-            "silver",  "rgba(255, 255, 255, 0.20)");
+    this.highlightTileAt = function(point) {
+        this.tiles.highlightAt(point);
     };
     this.movement = function(progress) {
-        if (progress.traveled % this.steps < progress.speed)
+        if (progress.traveled % this.scale < progress.speed)
             progress.heading = this.heading(progress.point, progress.heading);
         const trajectory = this.directions[progress.heading];
         progress.point.iAdd(trajectory.multi(progress.speed));
@@ -84,32 +79,40 @@ function Map(tiles, shape) {
     this.heading = function(point, heading) {
         return this.tiles.movement(this.tileValueAt(point), heading);
     };
-    this.isMap = function(point) {
-        return this.tileValueAt(point) !== undefined;
+    this.isMap = function(mousePoint) {
+        return this.tileValueAt(mousePoint, true) !== undefined;
     };
-    this.pointIs = function(point, val) {
-        return this.tileValueAt(point) === val;
+    this.pointIs = function(mousePoint, val) {
+        return this.tileValueAt(mousePoint, true) === val;
     };
-    this.tileValueAt = function(point) {
-        return this.structure.value(this.gridPosAt(point));
+    this.tileValueAt = function(point, fromMouse=false) {
+        return this.structure.value(this.gridPosAt(point, fromMouse));
     };
     this.startPos = function([x, y]) {
-        return this.centerOfTileAt(this.toTile(new Point(x, y)));
+        return this.toTile(new Point(x, y)).add(this.scale / 2, this.scale / 2);
     };
-    this.centerOfTileAt = function(point) {
-        return this.topOfTileAt(point).add(this.size / 2, this.size / 2);
+    this.centerOfTileAt = function(point, fromMouse=false) {
+        return this.topOfTileAt(point, fromMouse).add(
+            this.scale / 2, this.scale / 2);
     };
-    this.topOfTileAt = function(point) {
-        return this.toTile(this.gridPosAt(point));
+    this.topOfTileAt = function(point, fromMouse=false) {
+        return this.toTile(this.gridPosAt(point, fromMouse));
     };
     this.toTile = function(gridPoint) {
-        return gridPoint.multi(this.size);
+        return gridPoint.multi(this.scale);
     };
-    this.gridPosAt = function(point) {
-        return point.div(this.size).floor();
+    this.gridPosAt = function(point, fromMouse=false) {
+        return (fromMouse
+            ? this.tiles.toGrid(point) : point.div(this.scale).floor());
+    };
+    this.scalingFactor = function() {
+        return this.tiles.size/this.scale;
+    };
+    this.align = function(point) {
+        return this.tiles.align(point, this.scale);
     };
     this.dimensions = function dimensions() {
-        return this.structure.dimensions().multi(this.size);
+        return this.structure.dimensions().multi(this.scale);
     };
     return this;
 }
@@ -139,9 +142,11 @@ function MapStructure() {
     return this;
 }
 
-function TileSet(sprite, outline) {
+function TileSet(sprite, highlight, outline) {
     this.sprite = sprite;
+    this.highlight = highlight;
     this.outline = outline;
+    this.size = this.sprite.width;
     this.tileMovement = [
         undefined,
         undefined,
@@ -158,8 +163,21 @@ function TileSet(sprite, outline) {
     this.getHeight = function() {
         return this.sprite.height;
     };
-    this.draw = function(x, y, tileVal) {
-        this.sprite.draw(x, y, tileVal % 4, Math.floor(tileVal / 4));
+    this.draw = function(point, tileVal) {
+        const drawPos = this.toTile(point);
+        this.sprite.draw(drawPos.x, drawPos.y,
+            tileVal % 4, Math.floor(tileVal / 4));
+    };
+    this.highlightAt = function(point) {
+        const drawPos = this.toTile(this.toGrid(point));
+        this.highlight.draw(drawPos.x, drawPos.y, this.size, this.size,
+            "silver",  "rgba(255, 255, 255, 0.20)");
+    };
+    this.toGrid = function(point) {
+        return point.div(this.size).floor();
+    };
+    this.toTile = function(point) {
+        return point.multi(this.size);
     };
     this.drawOutline = function(x, y, tileVal, size=64) {
         this.outline.draw(x, y, tileVal, size);
@@ -171,6 +189,38 @@ function TileSet(sprite, outline) {
             else if (this.tileMovement[tileVal] == undefined) throw "Off path";
             throw e;
         }
+    };
+    this.align = function(point, scale) {
+        return point.multi(this.size/scale);
+    };
+    return this;
+}
+
+function IsoTileSet(sprite, highlight, outline) {
+    TileSet.call(this, sprite, highlight, outline);
+    this.size = this.sprite.width / 2;
+    this.drawnDims = function([x, y]) {
+        this.offset.change(y * this.size, 0);
+    };
+    this.draw = function(point, tileVal) {
+        const drawPos = this.toTile(point);
+        this.sprite.draw(drawPos.x - this.size, drawPos.y,
+            tileVal % 4, Math.floor(tileVal / 4));
+    };
+    this.toGrid = function(point) {
+        return this.toCartesian(point).div(this.size).floor();
+    };
+    this.toTile = function(point) {
+        return this.toIsometric(point.multi(this.size));
+    };
+    this.align = function(point, scale) {
+        return this.toIsometric(point).multi(this.size/scale);
+    };
+    this.toIsometric = function(point) {
+        return new Point(point.x - point.y, (point.x + point.y) / 2);
+    };
+    this.toCartesian = function(point) {
+        return new Point(point.x / 2 + point.y, point.y - point.x / 2);
     };
     return this;
 }

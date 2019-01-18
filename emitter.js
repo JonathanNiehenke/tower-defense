@@ -15,9 +15,9 @@ function Emitter(shape) {
             }
         }
     };
-    this.draw = function(condition, offset) {
+    this.draw = function(condition, adjust=undefined) {
         for(let particle of this.living)
-                particle.draw(condition, offset);
+                particle.draw(condition, adjust);
     };
     this.addParticle = function(point, direction, attributes) {
         let particle = (
@@ -44,9 +44,9 @@ function Particle(shape) {
     this.update = function() {
         this.point.iAdd(this.direction.multi(this.attributes.speed));
     };
-    this.draw = function(condition, offset) {
+    this.draw = function(condition, adjust) {
         if (condition !== undefined && !condition(this.point)) return;
-        const drawPos = offset === undefined ? this.point : offset(this.point);
+        const drawPos = adjust === undefined ? this.point : adjust(this.point);
         shape.draw(drawPos.x, drawPos.y, this.attributes.pSize,
             undefined, "red", "white");
     };
