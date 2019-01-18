@@ -1,9 +1,9 @@
-function MapSlice(tiles, shape) {
-    Map.call(this, tiles, shape);
+function MapSlice(drawnOrigin, tiles, shape) {
+    Map.call(this, drawnOrigin, tiles, shape);
     this.dims = this.from = this.to = this.offset = undefined;
     this.draw = function() {
         for (const [point, val] of this.structure.sliceIter(this.from, this.to))
-            this.tiles.draw(point, val);
+            this.tiles.draw(this.drawnOrigin, point, val);
     };
     this.divide = function(div, point) {
         this.dims = this.structure.dimensions().div(div);
@@ -42,7 +42,8 @@ function MapSlice(tiles, shape) {
     return this;
 }
 
-function Map(tiles, shape) {
+function Map(drawnOrigin, tiles, shape) {
+    this.drawnOrigin = drawnOrigin;
     this.tiles = tiles;
     this.shape = shape;
     this.scale = 60;  // Multiple of 5, 4, 3 and 2 for 1/5th speed etc.
@@ -56,7 +57,7 @@ function Map(tiles, shape) {
     };
     this.draw = function() {
         for (const [point, val] of this.structure.iter())
-            this.tiles.draw(point, val);
+            this.tiles.draw(this.drawnOrigin, point, val);
     };
     this.drawMini = function(origin, dims) {
         const sDims = this.structure.dimensions();
@@ -67,7 +68,7 @@ function Map(tiles, shape) {
         }
     };
     this.highlightTileAt = function(point) {
-        this.tiles.highlightAt(point);
+        this.tiles.highlightAt(this.drawnOrigin, point);
     };
     this.movement = function(progress) {
         if (progress.traveled % this.scale < progress.speed)
@@ -109,7 +110,8 @@ function Map(tiles, shape) {
         return this.tiles.size/this.scale;
     };
     this.align = function(point) {
-        return this.tiles.align(point, this.scale);
+        return this.tiles.align(point, this.scale).add(
+            this.drawnOrigin.x, this.drawnOrigin.y);
     };
     this.dimensions = function dimensions() {
         return this.structure.dimensions().multi(this.scale);
@@ -163,13 +165,13 @@ function TileSet(sprite, highlight, outline) {
     this.getHeight = function() {
         return this.sprite.height;
     };
-    this.draw = function(point, tileVal) {
-        const drawPos = this.toTile(point);
+    this.draw = function(origin, point, tileVal) {
+        const drawPos = this.toTile(point).add(origin.x, origin.y);
         this.sprite.draw(drawPos.x, drawPos.y,
             tileVal % 4, Math.floor(tileVal / 4));
     };
-    this.highlightAt = function(point) {
-        const drawPos = this.toTile(this.toGrid(point));
+    this.highlightAt = function(origin, point) {
+        const drawPos = this.toTile(this.toGrid(point)).add(origin.x, origin.y);
         this.highlight.draw(drawPos.x, drawPos.y, this.size, this.size,
             "silver",  "rgba(255, 255, 255, 0.20)");
     };
@@ -202,8 +204,8 @@ function IsoTileSet(sprite, highlight, outline) {
     this.drawnDims = function([x, y]) {
         this.offset.change(y * this.size, 0);
     };
-    this.draw = function(point, tileVal) {
-        const drawPos = this.toTile(point);
+    this.draw = function(origin, point, tileVal) {
+        const drawPos = this.toTile(point).add(origin.x, origin.y);
         this.sprite.draw(drawPos.x - this.size, drawPos.y,
             tileVal % 4, Math.floor(tileVal / 4));
     };

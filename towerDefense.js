@@ -22,7 +22,7 @@ function Game(bgCanvas, fgCanvas) {
         "irectangle": new IsoRectangle(this.fgContext),
         "outline": new RoadOutline(this.bgContext, 64, 64, "black"),
     };
-    this.map = new MapSlice(
+    this.map = new MapSlice(new Point(this.canvas.width / 2, 0),
         new IsoTileSet(this.sprites["iroads"], this.sprites["irectangle"], this.sprites["outline"]),
         this.sprites["rectangle"]);
     this.enemies = new Enemies(
@@ -30,7 +30,7 @@ function Game(bgCanvas, fgCanvas) {
         this.sprites["circle"], this.map.movement.bind(this.map));
     this.defense = new DefenseNetwork(
         this.sprites["towers"], new Orb(this.fgContext),
-        new IsoCircle(this.fgContext), this.sprites["rectangle"]);
+        this.sprites["icircle"], this.sprites["rectangle"]);
     this.towerMenu = new TowerMenu(
         new Point(20, 380), new Point(30, 0), this.sprites["towers"], 27/3);
     this.minimap = new MiniMap(new Point(600, 250), new Point(200, 200),
@@ -47,18 +47,14 @@ function Game(bgCanvas, fgCanvas) {
         levels[num].waves.forEach(
             wave => wave.start = this.map.startPos(wave.start));
         this.enemies.newWaves(levels[num].waves);
+        this.bgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.minimap.slice(new Point(0, 0));
-        this.drawFromMiddle(this.bgContext, this.map.draw.bind(this.map));
         this.minimap.mapDraw();
         this.animation = setInterval(this.loop.bind(this), 28);
     };
     this.loop = function() {
         this.update();
-        this.drawFromMiddle(this.fgContext, this.draw.bind(this));
-        this.towerMenu.draw(this.mousePos);
-        this.minimap.enemyDraw();
-        this.minimap.towerDraw();
-        this.minimap.viewDraw();
+        this.draw();
     };
     this.update = function() {
         this.enemies.update();
@@ -80,14 +76,8 @@ function Game(bgCanvas, fgCanvas) {
         try { this.loadLevel(this.levelNum++) }
         catch (_) { this.end(); }
     };
-    this.drawFromMiddle = function(context, drawFunc) {
-        context.save();
-        context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        context.translate(this.canvas.width / 2, 0);
-        drawFunc();
-        context.restore();
-    };
     this.draw = function() {
+        this.fgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.highlight(this.mousePos.sub(this.canvas.width / 2, 0));
         this.enemies.draw(
             this.map.isWithinSlice.bind(this.map),
@@ -95,6 +85,10 @@ function Game(bgCanvas, fgCanvas) {
         this.defense.draw(
             this.map.isWithinSlice.bind(this.map),
             this.map.alignToSlice.bind(this.map));
+        this.towerMenu.draw(this.mousePos);
+        this.minimap.enemyDraw();
+        this.minimap.towerDraw();
+        this.minimap.viewDraw();
     };
     this.highlight = function(mouseIso) {
         if (!this.map.isMapSlice(mouseIso)) return;
