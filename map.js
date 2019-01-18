@@ -22,13 +22,14 @@ function MapSlice(tiles, shape) {
             this.to.y > gridPoint.y && gridPoint.y >= this.from.y);
     };
     this.centerOfTileWithinMap = function(point) {
-        return this.centerOfTileAt(this.alignToMap(point));
+        return this.toTile(this.slicePointAt(point)).add(
+            this.size / 2, this.size / 2);
     };
     this.slicePointIs = function(point, val) {
-        return this.pointIs(this.alignToMap(point), val);
+        return this.structure.value(this.slicePointAt(point)) === val;
     };
-    this.alignToMap = function(point) {
-        return point.add(this.offset.x, this.offset.y);
+    this.slicePointAt = function(point) {
+        return this.gridPosAt(point).add(this.from.x, this.from.y);
     };
     this.alignToSlice = function(point) {
         return point.sub(this.offset.x, this.offset.y);
