@@ -11,8 +11,8 @@ function TowerMenu(origin, spacing, sprite, displayNum) {
     };
     this.drawDrag = function(mousePos) {
         if (this.dragged === undefined) return;
-        const drawPos = mousePos.sub(this.dragged.pos.x, this.dragged.pos.y);
-        sprite.draw(drawPos.x, drawPos.y, 0, this.dragged.value * 3);
+        const {x, y} = mousePos.sub(this.dragged.pos.x, this.dragged.pos.y);
+        sprite.draw(x, y, 0, this.dragged.value * 3);
     };
     this.mouseDown = function(mousePos) {
         this.menu.mouseAction(mousePos, this.drag.bind(this));
@@ -41,9 +41,9 @@ function Menu(origin, cellDims, drawable) {
     this.cellDims = cellDims;
     this.drawable = drawable;
     this.draw = function(menuX, menuY, ...args) {
-        const drawPos = this.origin.add(
+        const {x, y} = this.origin.add(
             menuX * this.cellDims.x, menuY * this.cellDims.y);
-        this.drawable.draw(drawPos.x, drawPos.y, ...args);
+        this.drawable.draw(x, y, ...args);
     };
 	this.mouseAction = function(mousePos, func) {
         const diff = mousePos.sub(this.origin.x, this.origin.y);

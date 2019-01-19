@@ -166,13 +166,12 @@ function TileSet(sprite, highlight, outline) {
         return this.sprite.height;
     };
     this.draw = function(origin, point, tileVal) {
-        const drawPos = this.toTile(point).add(origin.x, origin.y);
-        this.sprite.draw(drawPos.x, drawPos.y,
-            tileVal % 4, Math.floor(tileVal / 4));
+        const {x, y} = this.toTile(point).add(origin.x, origin.y);
+        this.sprite.draw(x, y, tileVal % 4, Math.floor(tileVal / 4));
     };
     this.highlightAt = function(origin, point) {
-        const drawPos = this.toTile(this.toGrid(point)).add(origin.x, origin.y);
-        this.highlight.draw(drawPos.x, drawPos.y, this.size, this.size,
+        const {x, y} = this.toTile(this.toGrid(point)).add(origin.x, origin.y);
+        this.highlight.draw(x, y, this.size, this.size,
             "silver",  "rgba(255, 255, 255, 0.20)");
     };
     this.toGrid = function(point) {
@@ -205,9 +204,8 @@ function IsoTileSet(sprite, highlight, outline) {
         this.offset.change(y * this.size, 0);
     };
     this.draw = function(origin, point, tileVal) {
-        const drawPos = this.toTile(point).add(origin.x, origin.y);
-        this.sprite.draw(drawPos.x - this.size, drawPos.y,
-            tileVal % 4, Math.floor(tileVal / 4));
+        const {x, y} = this.toTile(point).add(origin.x - this.size, origin.y);
+        this.sprite.draw(x, y, tileVal % 4, Math.floor(tileVal / 4));
     };
     this.toGrid = function(point) {
         return this.toCartesian(point).div(this.size).floor();
@@ -218,11 +216,11 @@ function IsoTileSet(sprite, highlight, outline) {
     this.align = function(point, scale) {
         return this.toIsometric(point).multi(this.size/scale);
     };
-    this.toIsometric = function(point) {
-        return new Point(point.x - point.y, (point.x + point.y) / 2);
+    this.toIsometric = function({x, y}) {
+        return new Point(x - y, (x + y) / 2);
     };
-    this.toCartesian = function(point) {
-        return new Point(point.x / 2 + point.y, point.y - point.x / 2);
+    this.toCartesian = function({x, y}) {
+        return new Point(x / 2 + y, y - x / 2);
     };
     return this;
 }

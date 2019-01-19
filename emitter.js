@@ -46,9 +46,8 @@ function Particle(shape) {
     };
     this.draw = function(condition, adjust) {
         if (condition !== undefined && !condition(this.point)) return;
-        const drawPos = adjust === undefined ? this.point : adjust(this.point);
-        shape.draw(drawPos.x, drawPos.y, this.attributes.pSize,
-            undefined, "red", "white");
+        const {x, y} = adjust === undefined ? this.point : adjust(this.point);
+        shape.draw(x, y, this.attributes.pSize, undefined, "red", "white");
     };
     this.outOfRange = function() {
         return this.origin.distFrom(this.point) > this.attributes.range;
