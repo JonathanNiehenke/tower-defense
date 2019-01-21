@@ -49,7 +49,7 @@ function Enemies(sprite, healthBarShape, circle, mapMovement) {
             creep.drawMini(origin.x, origin.y, size);
     };
     this.hit = function(withinRange, damageAmount) {
-        let creep = this.enemies.find(creep => withinRange(creep.point(), 5));
+        let creep = this.enemies.find(creep => withinRange(creep.point(), 7));
         try { creep.damage(damageAmount); }
         catch (_) { return false; }
         return true;
@@ -68,7 +68,7 @@ function Creep(sprite, healthBarShape, circle, mapMovement, waveAttributes) {
         "traveled": 0,
     };
     this.health = waveAttributes.health;
-    this.center = new Point(-this.sprite.width / 2, -this.sprite.height / 2);
+    this.center = new Point(this.sprite.width / 2, this.sprite.height / 2);
     this.facing = { "N": 0, "S": 1, "E": 2, "W": 3 };
     this.update = function() {
         try { this.mapMovement(this.progress); }
@@ -92,8 +92,8 @@ function Creep(sprite, healthBarShape, circle, mapMovement, waveAttributes) {
         this.sprite.draw(drawPos.x, drawPos.y, animation, facing);
     };
     this.drawPos = function(adjust=undefined) {
-        let drawPos = this.point().add(this.center.x, this.center.y).floor();
-        return adjust === undefined ? drawPos : adjust(drawPos);
+        return (adjust === undefined ? this.point() : adjust(this.point())
+            ).sub(this.center.x, this.center.y).floor();
     };
     this.drawMini = function(x, y, size) {
         const drawPos = this.point().div(size).add(x, y);
