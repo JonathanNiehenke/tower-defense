@@ -11,10 +11,12 @@ function Game(bgCanvas, fgCanvas) {
     this.mousePos = new Point(-1, -1);
     this.animation = undefined;
     this.levelNum = 0;
-    this.sprites = {
+    this.graphic = {
         "slime": new Sprite(this.fgContext, "sprites/SlimeIso.png", 4, 4),
         "towers": new Sprite(this.fgContext, "sprites/Towers.png", 27, 8),
+        "orb": new Orb(this.fgContext),
         "roads": new Sprite(this.bgContext,  "sprites/RoadSet_Kenney.png", 2, 4),
+        "health": new HealthBar(this.fgContext),
         "circle": new Circle(this.fgContext),
         "rectangle": new Rectangle(this.fgContext),
         "iroads": new Sprite(this.bgContext,  "sprites/IsoRoadSet_Kenney.png", 2, 4),
@@ -23,18 +25,18 @@ function Game(bgCanvas, fgCanvas) {
         "outline": new RoadOutline(this.bgContext, 64, 64, "black"),
     };
     this.map = new MapSlice(new Point(this.canvas.width / 2, 0),
-        new IsoTileSet(this.sprites["iroads"], this.sprites["irectangle"], this.sprites["outline"]),
-        this.sprites["rectangle"]);
+        new IsoTileSet(this.graphic["iroads"], this.graphic["irectangle"], this.graphic["outline"]),
+        this.graphic["rectangle"]);
     this.enemies = new Enemies(
-        this.sprites["slime"], new HealthBar(this.fgContext),
-        this.sprites["circle"], this.map.movement.bind(this.map));
+        this.graphic["slime"], this.graphic["health"],
+        this.graphic["circle"], this.map.movement.bind(this.map));
     this.defense = new DefenseNetwork(
-        this.sprites["towers"], new Orb(this.fgContext),
-        this.sprites["icircle"], this.sprites["rectangle"], this.sprites["circle"]);
+        this.graphic["towers"], this.graphic["orb"], this.graphic["icircle"],
+        this.graphic["rectangle"], this.graphic["circle"]);
     this.towerMenu = new TowerMenu(
-        new Point(20, 380), new Point(30, 0), this.sprites["towers"], 27/3);
+        new Point(20, 380), new Point(30, 0), this.graphic["towers"], 27/3);
     this.minimap = new MiniMap(new Point(600, 250), new Point(200, 200),
-        2, this.map, this.enemies, this.defense, this.sprites["rectangle"]);
+        2, this.map, this.enemies, this.defense, this.graphic["rectangle"]);
     this.init = function() {
         this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
         this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));

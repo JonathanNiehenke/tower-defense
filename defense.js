@@ -10,7 +10,7 @@ function DefenseNetwork(sprite, particleShape, rangeShape, miniShape, miniRange)
         this.emitter.draw(condition, adjust);
     };
     this.drawMini = function(origin, size) {
-        this.towers.forEach(tower => tower.drawMini(origin.x, origin.y, size));
+        this.towers.forEach(tower => tower.drawMini(origin, size));
     };
     this.upgradeAt = function(point) {
         try { this.towerAt(point).upgrade(); }
@@ -21,7 +21,7 @@ function DefenseNetwork(sprite, particleShape, rangeShape, miniShape, miniRange)
         catch (e) { if (!(e instanceof TypeError)) throw e; }
     };
     this.highlightMiniRangeAt = function(point, origin, size) {
-        try { this.towerAt(point).highlightMiniRange(origin.x, origin.y, size); }
+        try { this.towerAt(point).highlightMiniRange(origin, size); }
         catch (e) { if (!(e instanceof TypeError)) throw e; }
     };
     this.place = function(type, point) {
@@ -91,24 +91,23 @@ function Tower(sprite, point, type, rangeShape, miniShape, miniRange, addParticl
     this.col = 6;
     this.draw = function(condition=undefined, adjust=undefined) {
         if (condition !== undefined && !condition(this.point)) return;
-        let drawPos = this.drawPos(adjust).sub(this.centerFeet.x, this.centerFeet.y);
-        this.sprite.draw(
-            drawPos.x, drawPos.y, this.col, this.type + this.level);
+        const {x, y} = this.drawPos(adjust).sub(
+            this.centerFeet.x, this.centerFeet.y);
+        this.sprite.draw(x, y, this.col, this.type + this.level);
     };
-    this.drawMini = function(x, y, size) {
-        const drawPos = this.point.div(size).add(x - 12/size, y - 12/size);
-        miniShape.draw(drawPos.x, drawPos.y, 24/size, 24/size, "black", "black");
+    this.drawMini = function(origin, size) {
+        const {x, y} = this.point.div(size).add(
+            origin.x - 12/size, origin.y - 12/size);
+        miniShape.draw(x, y, 24/size, 24/size, "black", "black");
     };
     this.highlightRange = function(adjust, scalingFactor) {
-        let drawPos = this.drawPos(adjust);
-        rangeShape.draw(
-            drawPos.x, drawPos.y, this.attributes.range * scalingFactor,
-            undefined, "SteelBlue",  "rgba(30, 144, 255, 0.20)")
+        const {x, y} = this.drawPos(adjust);
+        rangeShape.draw(x, y, this.attributes.range * scalingFactor,
+            undefined, "SteelBlue",  "rgba(30, 144, 255, 0.20)");
     };
-    this.highlightMiniRange = function(x, y, size) {
-        const drawPos = this.point.div(size).add(x, y);
-        miniRange.draw(
-            drawPos.x, drawPos.y, this.attributes.range/size,
+    this.highlightMiniRange = function(origin, size) {
+        const {x, y} = this.point.div(size).add(origin.x, origin.y);
+        miniRange.draw(x, y, this.attributes.range/size,
             undefined, "SteelBlue",  "rgba(30, 144, 255, 0.20)");
     };
     this.drawPos = function(adjust=undefined) {
