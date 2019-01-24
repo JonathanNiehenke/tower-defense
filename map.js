@@ -47,11 +47,8 @@ function Map(drawnOrigin, tiles, shape) {
     this.tiles = tiles;
     this.shape = shape;
     this.scale = 60;  // Multiple of 5, 4, 3 and 2 for 1/5th speed etc.
-    this.directions = {
-        "N": (new Point(0, -1)), "S": (new Point(0, 1)),
-        "E": (new Point(1, 0)), "W": (new Point(-1, 0)),
-    };
     this.structure = new MapStructure();
+    this.motion = new PathMovement(this.scale);
     this.applyLevel = function(structure) {
         this.structure.new(structure);
     };
@@ -71,14 +68,7 @@ function Map(drawnOrigin, tiles, shape) {
         this.tiles.highlightAt(this.drawnOrigin, point);
     };
     this.movement = function(progress) {
-        if (progress.traveled % this.scale < progress.speed)
-            progress.heading = this.heading(progress.point, progress.heading);
-        const trajectory = this.directions[progress.heading];
-        progress.point.iAdd(trajectory.multi(progress.speed));
-        progress.traveled += progress.speed;
-    };
-    this.heading = function(point, heading) {
-        return this.tiles.movement(this.tileValueAt(point), heading);
+        this.motion.move(progress, this.tileValueAt(progress.point));
     };
     this.isMap = function(mousePoint) {
         return this.tileValueAt(mousePoint, true) !== undefined;
@@ -144,12 +134,12 @@ function MapStructure() {
     return this;
 }
 
-function TileSet(sprite, highlight, outline) {
-    this.sprite = sprite;
-    this.highlight = highlight;
-    this.outline = outline;
-    this.size = this.sprite.width;
-    this.tileMovement = [
+function PathMovement(scale) {
+    this.directions = {
+        "N": (new Point(0, -1)), "S": (new Point(0, 1)),
+        "E": (new Point(1, 0)), "W": (new Point(-1, 0)),
+    };
+    this.paths = [
         undefined,
         undefined,
         (H) => { return H == "N" ? "N" : "S"; },
@@ -159,6 +149,31 @@ function TileSet(sprite, highlight, outline) {
         (H) => { return H == "N" ? "E" : "S"; },
         (H) => { return H == "N" ? "W" : "S"; },
     ];
+    this.move = function(progress, path) {
+        if (progress.traveled % scale < progress.speed)
+            progress.heading = this.heading(path, progress.heading);
+        this.moveForward(progress);
+    };
+    this.heading = function(path, heading) {
+        try { return this.paths[path](heading); }
+        catch (e) {
+            if (path === undefined) throw "Invalid path value";
+            if (this.paths[path] === undefined) throw "Off path";
+            throw e;
+        }
+    };
+    this.moveForward = function(progress) {
+        const trajectory = this.directions[progress.heading];
+        progress.point.iAdd(trajectory.multi(progress.speed));
+        progress.traveled += progress.speed;
+    };
+};
+
+function TileSet(sprite, highlight, outline) {
+    this.sprite = sprite;
+    this.highlight = highlight;
+    this.outline = outline;
+    this.size = this.sprite.width;
     this.getWidth = function() {
         return this.sprite.width;
     };
@@ -182,14 +197,6 @@ function TileSet(sprite, highlight, outline) {
     };
     this.drawOutline = function(x, y, tileVal, size=64) {
         this.outline.draw(x, y, tileVal, size);
-    };
-    this.movement = function(tileVal, heading) {
-        try { return this.tileMovement[tileVal](heading); }
-        catch (e) {
-            if (tileVal === undefined) throw "Off map";
-            else if (this.tileMovement[tileVal] == undefined) throw "Off path";
-            throw e;
-        }
     };
     this.align = function(point, scale) {
         return point.multi(this.size/scale);
