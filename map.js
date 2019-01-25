@@ -17,23 +17,15 @@ function MapSlice(origin, map, tiles) {
     this.isWithinSliceDims = function({x, y}) {
         return (this.dims.x > x && x >= 0 && this.dims.y > y && y >= 0);
     };
-    this.slicePointIs = function(mousePoint, val) {
-        const gridPoint = this.slicePointAt(mousePoint);
-        if (this.isWithinGridSlice(gridPoint))
-            return this.structure.value(gridPoint) === val;
-        return false;
+    this.pointIs = function(mousePoint, val) {
+        return map.value(this.slicePointAt(mousePoint)) === val;
     };
     this.isWithinSlice = function(mapPoint) {
         const slicePoint = map.toGrid(mapPoint).sub(this.from.x, this.from.y);
         return this.isWithinSliceDims(slicePoint);
     };
-    this.isWithinGridSlice = function({x, y}) {
-        return (this.to.x > x && x >= this.from.x &&
-            this.to.y > y && y >= this.from.y);
-    };
-    this.centerOfTileWithinMap = function(point, fromMouse=false) {
-        return this.toTile(this.slicePointAt(point)).add(
-            this.scale / 2, this.scale / 2);
+    this.centerOfTileAt = function(mousePoint) {
+        return map.centerOf(this.slicePointAt(mousePoint));
     };
     this.slicePointAt = function(point) {
         return this.gridPosAt(point).add(this.from.x, this.from.y);
@@ -59,8 +51,8 @@ function Map() {
     this.startPos = function([x, y]) {
         return this.toTile(new Point(x, y)).add(this.scale / 2, this.scale / 2);
     };
-    this.centerOfTileAt = function(point) {
-        return this.topOfTileAt(point).add(
+    this.centerOf = function(gridPoint) {
+        return this.toTile(gridPoint).add(
             this.scale / 2, this.scale / 2);
     };
     this.topOfTileAt = function(point) {
@@ -158,11 +150,14 @@ function MapIllustrator(origin, map, tiles) {
     this.pointIs = function(mousePoint, val) {
         return map.value(this.gridPosAt(mousePoint)) === val;
     };
+    this.centerOfTileAt = function(mousePoint) {
+        return map.centerOf(this.gridPosAt(mousePoint));
+    };
     this.gridPosAt = function(mousePoint) {
         return this.tiles.toGrid(mousePoint)
     };
     this.scalingFactor = function() {
-        return this.tiles.size/this.scale;
+        return this.tiles.size/this.map.scale;
     };
     this.align = function(point) {
         return this.tiles.align(point, this.map.scale).add(

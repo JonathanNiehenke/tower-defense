@@ -85,9 +85,9 @@ function Game(bgCanvas, fgCanvas) {
         this.enemies.draw(
             this.field.isWithinSlice.bind(this.field),
             this.field.align.bind(this.field));
-        this.defense.draw();
-            // this.field.isWithinSlice.bind(this.field),
-            // this.field.alignToSlice.bind(this.field));
+        this.defense.draw(
+            this.field.isWithinSlice.bind(this.field),
+            this.field.align.bind(this.field));
         this.towerMenu.draw(this.mousePos);
         this.minimap.enemyDraw();
         this.minimap.towerDraw();
@@ -96,10 +96,10 @@ function Game(bgCanvas, fgCanvas) {
     this.highlight = function(mouseIso) {
         if (!this.field.isMap(mouseIso)) return;
         this.field.highlightTileAt(mouseIso);
-        //let towerPos = this.field.centerOfTileAt(mouseIso, true);
-        // this.defense.highlightRangeAt(towerPos,
-            // this.field.align.bind(this.map), this.map.scalingFactor());
-        // this.minimap.rangeDraw(towerPos);
+        let towerPos = this.field.centerOfTileAt(mouseIso);
+        this.defense.highlightRangeAt(towerPos,
+            this.field.align.bind(this.field), this.field.scalingFactor());
+        this.minimap.rangeDraw(towerPos);
     };
     this.mouseMove = function(e) {
         let rect = this.canvas.getBoundingClientRect();
@@ -107,20 +107,16 @@ function Game(bgCanvas, fgCanvas) {
     };
     this.mouseDown = function() {
         const mouseIso = this.mousePos.sub(this.canvas.width / 2, 0);
-        if (this.field.isMap(mouseIso)) {
-            this.defense.upgradeAt(
-                this.map.centerOfTileWithinMap(mouseIso, true));
-        }
+        if (this.field.isMap(mouseIso))
+            this.defense.upgradeAt(this.field.centerOfTileAt(mouseIso));
         this.towerMenu.mouseDown(this.mousePos);
         this.minimap.mouseDown(this.mousePos);
     };
     this.mouseUp = function() {
         const mouseIso = this.mousePos.sub(this.canvas.width / 2, 0);
         const type = this.towerMenu.mouseUpValue();
-        if (type !== undefined && this.map.slicePointIs(mouseIso, 0)) {
-            this.defense.place(
-                type, this.map.centerOfTileWithinMap(mouseIso, true));
-        }
+        if (type !== undefined && this.field.pointIs(mouseIso, 0))
+            this.defense.place(type, this.field.centerOfTileAt(mouseIso));
     };
     this.end = function() {
         clearInterval(this.animation);
@@ -147,10 +143,11 @@ function MiniMap(origin, dims, sqrDivisions, field, mini, enemies, defense, view
         enemies.draw(undefined, mini.align.bind(mini));
     };
     this.towerDraw = function() {
-        defense.drawMini(this.origin, this.size);
+        defense.draw(undefined, mini.align.bind(mini));
     };
     this.rangeDraw = function(towerPos) {
-        defense.highlightMiniRangeAt(towerPos, this.origin, this.size);
+        defense.highlightMiniRangeAt(towerPos,
+            mini.align.bind(mini), mini.scalingFactor());
     };
     this.viewDraw = function() {
         this.viewPort.draw(this.slicePos.x, this.slicePos.y, this.viewDims.x,
