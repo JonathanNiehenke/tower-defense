@@ -164,6 +164,7 @@ function MapIllustrator(origin, map, tiles) {
         return this.tiles.align(point, this.map.scale).add(
             this.origin.x, this.origin.y);
     };
+    this.dimensions = map.dimensions.bind(map);
     return this;
 }
 
