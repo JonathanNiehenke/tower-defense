@@ -13,6 +13,7 @@ function Game(bgCanvas, fgCanvas) {
     this.levelNum = 0;
     this.graphic = {
         "slime": new Sprite(this.fgContext, "sprites/SlimeIso.png", 4, 4),
+        "mslime": new Sprite(this.fgContext, "sprites/SlimeIso.png", 4, 4, 1/2),
         "towers": new Sprite(this.fgContext, "sprites/Towers.png", 27, 8),
         "orb": new Orb(this.fgContext),
         "roads": new Sprite(this.bgContext,  "sprites/RoadSet_Mini.png", 2, 4),
@@ -27,8 +28,8 @@ function Game(bgCanvas, fgCanvas) {
     this.field = new MapSlice(new Point(this.canvas.width / 2, 0), this.map,
         new IsoTileSet(this.graphic["iroads"], this.graphic["irectangle"]));
     this.enemies = new Enemies(
-        this.graphic["slime"], this.graphic["health"],
-        this.graphic["circle"], this.map.movement.bind(this.map));
+        this.graphic["slime"], this.graphic["mslime"], this.graphic["health"],
+        this.map.movement.bind(this.map));
     this.defense = new DefenseNetwork(
         this.graphic["towers"], this.graphic["orb"], this.graphic["icircle"],
         this.graphic["rectangle"], this.graphic["circle"]);
@@ -140,7 +141,7 @@ function MiniMap(origin, dims, sqrDivisions, field, mini, enemies, defense, view
         mini.draw();
     };
     this.enemyDraw = function() {
-        enemies.draw(undefined, mini.align.bind(mini));
+        enemies.drawMini(undefined, mini.align.bind(mini));
     };
     this.towerDraw = function() {
         defense.draw(undefined, mini.align.bind(mini));

@@ -1,12 +1,23 @@
+function scaleImage(scale, Name) {
+    let img = loadImage(Name);
+    let canvas = new OffscreenCanvas(
+        img.width * scale, img.height * scale);
+    canvas.getContext('2d').drawImage(img,
+        0, 0, img.width, img.height,  // Source
+        0, 0, img.width*scale, img.height*scale);
+    return canvas;
+}
+
 function loadImage(Name) {
     let img = new Image();
     img.src = Name;
     return img;
 }
 
-function Sprite(context, imgSheet, imgRows, imgCols) {
+function Sprite(context, imgSheet, imgRows, imgCols, scale=undefined) {
     this.context = context;
-    this.img = loadImage(imgSheet);
+    this.img = scale === undefined
+        ? loadImage(imgSheet) : scaleImage(scale, imgSheet);
     this.width = this.img.width / imgCols;
     this.height = this.img.height / imgRows;
     this.draw = function(x, y, col, row) {
