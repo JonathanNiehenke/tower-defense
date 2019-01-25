@@ -24,7 +24,7 @@ function Game(bgCanvas, fgCanvas) {
         "irectangle": new IsoRectangle(this.fgContext),
     };
     this.map = new Map();
-    this.field = new MapIllustrator(new Point(this.canvas.width / 2, 0), this.map,
+    this.field = new MapSlice(new Point(this.canvas.width / 2, 0), this.map,
         new IsoTileSet(this.graphic["iroads"], this.graphic["irectangle"]));
     this.enemies = new Enemies(
         this.graphic["slime"], this.graphic["health"],
@@ -36,8 +36,8 @@ function Game(bgCanvas, fgCanvas) {
         new Point(20, 380), new Point(30, 0), this.graphic["towers"], 27/3);
     mini = new MapIllustrator(new Point(600, 250), this.map,
         new TileSet(this.graphic["roads"], this.graphic["rectangle"]));
-    this.minimap = new MiniMap(new Point(600, 250), new Point(200, 200),
-        2, mini, this.enemies, this.defense, this.graphic["rectangle"]);
+    this.minimap = new MiniMap(new Point(600, 250), new Point(200, 200), 2,
+        this.field, mini, this.enemies, this.defense, this.graphic["rectangle"]);
     this.init = function() {
         this.canvas.addEventListener("mousemove", this.mouseMove.bind(this));
         this.canvas.addEventListener("mousedown", this.mouseDown.bind(this));
@@ -51,7 +51,6 @@ function Game(bgCanvas, fgCanvas) {
             wave => wave.start = this.map.startPos(wave.start));
         this.enemies.newWaves(levels[num].waves);
         this.bgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.field.draw();
         this.minimap.slice(new Point(0, 0));
         this.minimap.mapDraw();
         this.animation = setInterval(this.loop.bind(this), 28);
@@ -83,8 +82,8 @@ function Game(bgCanvas, fgCanvas) {
     this.draw = function() {
         this.fgContext.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.highlight(this.mousePos.sub(this.canvas.width / 2, 0));
-        this.enemies.draw(undefined,
-            // this.field.isWithinSlice.bind(this.field),
+        this.enemies.draw(
+            this.field.isWithinSlice.bind(this.field),
             this.field.align.bind(this.field));
         this.defense.draw();
             // this.field.isWithinSlice.bind(this.field),
@@ -108,12 +107,12 @@ function Game(bgCanvas, fgCanvas) {
     };
     this.mouseDown = function() {
         const mouseIso = this.mousePos.sub(this.canvas.width / 2, 0);
-        if (this.map.isMap(mouseIso)) {
+        if (this.field.isMap(mouseIso)) {
             this.defense.upgradeAt(
                 this.map.centerOfTileWithinMap(mouseIso, true));
         }
         this.towerMenu.mouseDown(this.mousePos);
-        // this.minimap.mouseDown(this.mousePos);
+        this.minimap.mouseDown(this.mousePos);
     };
     this.mouseUp = function() {
         const mouseIso = this.mousePos.sub(this.canvas.width / 2, 0);
@@ -130,7 +129,7 @@ function Game(bgCanvas, fgCanvas) {
     return this;
 }
 
-function MiniMap(origin, dims, sqrDivisions, mini, enemies, defense, viewShape) {
+function MiniMap(origin, dims, sqrDivisions, field, mini, enemies, defense, viewShape) {
     this.origin = origin;
     this.dims = dims;
     this.slicePos = this.size = undefined;
@@ -145,9 +144,7 @@ function MiniMap(origin, dims, sqrDivisions, mini, enemies, defense, viewShape) 
         mini.draw();
     };
     this.enemyDraw = function() {
-        enemies.draw(undefined,
-            // this.field.isWithinSlice.bind(this.field),
-            mini.align.bind(mini));
+        enemies.draw(undefined, mini.align.bind(mini));
     };
     this.towerDraw = function() {
         defense.drawMini(this.origin, this.size);
@@ -164,9 +161,8 @@ function MiniMap(origin, dims, sqrDivisions, mini, enemies, defense, viewShape) 
     };
     this.slice = function(cell) {
         if (cell.x >= 0 && cell.y >= 0) {
-            this.slicePos = cell
-            // map.divide(sqrDivisions, this.slicePos = cell);
-            mini.draw();
+            field.divide(sqrDivisions, this.slicePos = cell);
+            field.draw();
         }
     };
     return this;

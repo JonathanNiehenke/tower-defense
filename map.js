@@ -1,43 +1,47 @@
-function MapSlice(drawnOrigin, tiles, shape) {
-    Map.call(this, drawnOrigin, tiles, shape);
+function MapSlice(origin, map, tiles) {
+    MapIllustrator.call(this, origin, map, tiles);
     this.dims = this.from = this.to = this.offset = undefined;
     this.draw = function() {
-        for (const [point, val] of this.structure.sliceIter(this.from, this.to))
-            this.tiles.draw(this.drawnOrigin, point, val);
+        for (const [point, val] of map.structure.sliceIter(this.from, this.to))
+            this.tiles.draw(this.origin, point, val);
     };
     this.divide = function(div, point) {
-        this.dims = this.structure.dimensions().div(div);
+        this.dims = map.structure.dimensions().div(div);
         this.from = new Point(point.x * this.dims.x, point.y * this.dims.y);
         this.to = this.from.add(this.dims.x, this.dims.y);
-        this.offset = this.from.multi(this.scale);
+        this.offset = this.from.multi(map.scale);
     };
-    this.isMapSlice = function(point) {
-        const gridPoint = this.gridPosAt(point, true);
-        return (this.dims.x > gridPoint.x && gridPoint.x >= 0 &&
-            this.dims.y > gridPoint.y && gridPoint.y >= 0);
+    this.isMap = function(mousePoint) {
+        return this.isWithinSliceDims(this.gridPosAt(mousePoint));
     };
-    this.isWithinSlice = function(point) {
-        return this.isWithinGridSlice(this.gridPosAt(point));
+    this.isWithinSliceDims = function({x, y}) {
+        return (this.dims.x > x && x >= 0 && this.dims.y > y && y >= 0);
     };
-    this.isWithinGridSlice = function(gridPoint) {
-        return (this.to.x > gridPoint.x && gridPoint.x >= this.from.x &&
-            this.to.y > gridPoint.y && gridPoint.y >= this.from.y);
-    };
-    this.centerOfTileWithinMap = function(point, fromMouse=false) {
-        return this.toTile(this.slicePointAt(point, true)).add(
-            this.scale / 2, this.scale / 2);
-    };
-    this.slicePointIs = function(point, val) {
-        const gridPoint = this.slicePointAt(point, true);
+    this.slicePointIs = function(mousePoint, val) {
+        const gridPoint = this.slicePointAt(mousePoint);
         if (this.isWithinGridSlice(gridPoint))
             return this.structure.value(gridPoint) === val;
         return false;
     };
-    this.slicePointAt = function(point, fromMouse=false) {
-        return this.gridPosAt(point, fromMouse).add(this.from.x, this.from.y);
+    this.isWithinSlice = function(mapPoint) {
+        const slicePoint = map.toGrid(mapPoint).sub(this.from.x, this.from.y);
+        return this.isWithinSliceDims(slicePoint);
     };
-    this.alignToSlice = function(point) {
-        return this.align(point.sub(this.offset.x, this.offset.y));
+    this.isWithinGridSlice = function({x, y}) {
+        return (this.to.x > x && x >= this.from.x &&
+            this.to.y > y && y >= this.from.y);
+    };
+    this.centerOfTileWithinMap = function(point, fromMouse=false) {
+        return this.toTile(this.slicePointAt(point)).add(
+            this.scale / 2, this.scale / 2);
+    };
+    this.slicePointAt = function(point) {
+        return this.gridPosAt(point).add(this.from.x, this.from.y);
+    };
+    this.align = function(mapPoint) {
+        const slicePoint = mapPoint.sub(this.offset.x, this.offset.y);
+        return this.tiles.align(slicePoint, this.map.scale).add(
+            this.origin.x, this.origin.y);
     };
     return this;
 }
