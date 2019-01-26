@@ -1,7 +1,8 @@
 function scaleImage(scale, Name) {
     let img = loadImage(Name);
-    let canvas = new OffscreenCanvas(
-        img.width * scale, img.height * scale);
+    let canvas = document.createElement('canvas');
+    canvas.width = img.width * scale;
+    canvas.height = img.height * scale;
     canvas.getContext('2d').drawImage(img,
         0, 0, img.width, img.height,  // Source
         0, 0, img.width*scale, img.height*scale);
