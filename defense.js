@@ -1,4 +1,4 @@
-function DefenseNetwork(sprite, particleShape, rangeShape, miniShape, miniRange) {
+function DefenseNetwork(sprite, particleShape, rangeShape, mini, miniRange) {
     this.emitter = new Emitter(particleShape);
     this.towers = [];
     this.update = function(enemyPositions, hitEnemies) {
@@ -9,8 +9,8 @@ function DefenseNetwork(sprite, particleShape, rangeShape, miniShape, miniRange)
         this.towers.forEach(tower => tower.draw(condition, adjust));
         this.emitter.draw(condition, adjust);
     };
-    this.drawMini = function(origin, size) {
-        this.towers.forEach(tower => tower.drawMini(origin, size));
+    this.drawMini = function(condition=undefined, adjust=undefined) {
+        this.towers.forEach(tower => tower.drawMini(condition, adjust));
     };
     this.upgradeAt = function(point) {
         try { this.towerAt(point).upgrade(); }
@@ -27,7 +27,7 @@ function DefenseNetwork(sprite, particleShape, rangeShape, miniShape, miniRange)
     this.place = function(type, point) {
         if (this.towerAt(point)) return;
         this.towers.push(new Tower(
-            sprite, point, type, rangeShape, miniShape, miniRange,
+            sprite, point, type, rangeShape, mini, miniRange,
 	        this.emitter.addParticle.bind(this.emitter)));
     };
     this.towerAt = function(point) {
@@ -79,7 +79,7 @@ let towerTypes = [
         {"damage": 4, "range": 200, "pAmount": 6, "pSize": 10, "reload": 30, "speed": 8}, ],
 ];
 
-function Tower(sprite, point, type, rangeShape, miniShape, miniRange, addParticle) {
+function Tower(sprite, point, type, rangeShape, mini, miniRange, addParticle) {
     this.sprite = sprite;
     this.point = point;
     this.type = type * 3;
@@ -87,6 +87,7 @@ function Tower(sprite, point, type, rangeShape, miniShape, miniRange, addParticl
     this.level = 0;
     this.attributes = this.variations[this.level];
     this.centerFeet = new Point(this.sprite.width / 2, this.sprite.height);
+    this.miniCenter = new Point(mini.width / 2, mini.height / 2);
     this.currentReload = this.attributes.reload;
     this.col = 6;
     this.draw = function(condition=undefined, adjust=undefined) {
@@ -95,10 +96,11 @@ function Tower(sprite, point, type, rangeShape, miniShape, miniRange, addParticl
             this.centerFeet.x, this.centerFeet.y);
         this.sprite.draw(x, y, this.col, this.type + this.level);
     };
-    this.drawMini = function(origin, size) {
-        const {x, y} = this.point.div(size).add(
-            origin.x - 12/size, origin.y - 12/size);
-        miniShape.draw(x, y, 24/size, 24/size, "black", "black");
+    this.drawMini = function(condition=undefined, adjust=undefined) {
+        if (condition !== undefined && !condition(this.point)) return;
+        const {x, y} = this.drawPos(adjust).sub(
+            this.miniCenter.x, this.miniCenter.y);
+        mini.draw(x, y, this.col, this.type + this.level);
     };
     this.highlightRange = function(adjust, scalingFactor) {
         const {x, y} = this.drawPos(adjust);

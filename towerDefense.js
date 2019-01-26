@@ -15,6 +15,7 @@ function Game(bgCanvas, fgCanvas) {
         "slime": new Sprite(this.fgContext, "sprites/SlimeIso.png", 4, 4),
         "mslime": new Sprite(this.fgContext, "sprites/SlimeIso.png", 4, 4, 1/2),
         "towers": new Sprite(this.fgContext, "sprites/Towers.png", 27, 8),
+        "mtowers": new Sprite(this.fgContext, "sprites/Towers.png", 27, 8, 1/2),
         "orb": new Orb(this.fgContext),
         "roads": new Sprite(this.bgContext,  "sprites/RoadSet_Mini.png", 2, 4),
         "health": new HealthBar(this.fgContext),
@@ -32,7 +33,7 @@ function Game(bgCanvas, fgCanvas) {
         this.map.movement.bind(this.map));
     this.defense = new DefenseNetwork(
         this.graphic["towers"], this.graphic["orb"], this.graphic["icircle"],
-        this.graphic["rectangle"], this.graphic["circle"]);
+        this.graphic["mtowers"], this.graphic["circle"]);
     this.towerMenu = new TowerMenu(
         new Point(20, 380), new Point(30, 0), this.graphic["towers"], 27/3);
     mini = new MapIllustrator(new Point(600, 250), this.map,
@@ -144,7 +145,7 @@ function MiniMap(origin, dims, sqrDivisions, field, mini, enemies, defense, view
         enemies.drawMini(undefined, mini.align.bind(mini));
     };
     this.towerDraw = function() {
-        defense.draw(undefined, mini.align.bind(mini));
+        defense.drawMini(undefined, mini.align.bind(mini));
     };
     this.rangeDraw = function(towerPos) {
         defense.highlightMiniRangeAt(towerPos,
